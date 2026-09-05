@@ -1,0 +1,6 @@
+{
+  "name": "Lora Edge — AI Architectural Design & Sustainable Building Platform",
+  "description": "Professional AI-powered architectural CAD, 2D floor-plan editor, real-time 3D BIM viewer, EDGE-inspired green building simulation, and generative design platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
