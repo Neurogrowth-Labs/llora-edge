@@ -28,7 +28,7 @@ export const ArchitecturalLetterhead: React.FC<ArchitecturalLetterheadProps> = (
     return (
       <div className={`w-full bg-[#0A0E17] border border-[#222B3D] rounded-t p-3 flex items-center justify-between text-xs font-mono select-none ${className}`}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded bg-[#05070B] border border-[#2DD4BF]/40 p-0.5 flex items-center justify-center overflow-hidden shadow-sm">
+          <div className="w-9 h-9 flex items-center justify-center">
             <img
               src={APP_LOGO}
               onError={(e) => {
@@ -66,20 +66,15 @@ export const ArchitecturalLetterhead: React.FC<ArchitecturalLetterheadProps> = (
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         {/* Practice Logo & Identity */}
         <div className="flex items-center gap-3.5">
-          <div className="relative group">
-            <div className="w-14 h-14 rounded-lg bg-[#04060A] border-2 border-[#2DD4BF]/50 p-1 flex items-center justify-center overflow-hidden shadow-lg shadow-[#2DD4BF]/10 transition">
-              <img
-                src={APP_LOGO}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = APP_LOGO_STATIC_URL;
-                }}
-                alt="Architectural Practice Logo"
-                className="w-full h-full object-contain rounded"
-              />
-            </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#2DD4BF] text-black flex items-center justify-center text-[9px] font-bold shadow">
-              ✓
-            </div>
+          <div className="w-14 h-14 flex items-center justify-center">
+            <img
+              src={APP_LOGO}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = APP_LOGO_STATIC_URL;
+              }}
+              alt="Architectural Practice Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
 
           <div>

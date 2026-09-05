@@ -523,7 +523,7 @@ export const DocumentStudio: React.FC<DocumentStudioProps> = ({ project }) => {
           {/* PROFESSIONAL ARCHITECTURAL TITLE BLOCK (Bottom Bar) */}
           <div className="mt-8 pt-4 border-t-2 border-[#222222] grid grid-cols-12 gap-4 text-xs font-mono">
             <div className="col-span-4 border-r border-[#222222] pr-3 flex items-center gap-3">
-              <div className="w-10 h-10 rounded bg-[#05070B] border border-[#2DD4BF]/40 p-0.5 flex-shrink-0 flex items-center justify-center overflow-hidden shadow">
+              <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center">
                 <img
                   src={APP_LOGO}
                   onError={(e) => {

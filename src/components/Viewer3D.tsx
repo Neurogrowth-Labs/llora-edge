@@ -1581,7 +1581,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
         {/* Right: Orbit Navigation Helper & Official Letterhead Brand Watermark */}
         <div className="flex items-center gap-3">
           <div className="bg-[#05070B]/90 backdrop-blur-md border border-[#2DD4BF]/40 px-2.5 py-1 rounded-lg flex items-center gap-2 pointer-events-none shadow-xl font-mono">
-            <div className="w-5 h-5 rounded bg-[#0A0E17] border border-[#2DD4BF]/50 p-0.5 flex items-center justify-center overflow-hidden">
+            <div className="w-5 h-5 flex items-center justify-center">
               <img
                 src={APP_LOGO}
                 onError={(e) => {

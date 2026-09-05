@@ -451,7 +451,7 @@ export const AiVisualizer: React.FC<AiVisualizerProps> = ({ project }) => {
               {/* OFFICIAL ARCHITECTURAL LETTERHEAD WATERMARK HEADER */}
               <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
                 <div className="bg-[#05070B]/90 backdrop-blur-md border border-[#2DD4BF]/50 rounded-lg p-2 flex items-center gap-3 shadow-2xl">
-                  <div className="w-8 h-8 rounded bg-[#0A0E17] border border-[#2DD4BF]/60 p-0.5 flex-shrink-0 flex items-center justify-center overflow-hidden shadow">
+                  <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
                     <img
                       src={APP_LOGO}
                       onError={(e) => {
@@ -553,7 +553,7 @@ export const AiVisualizer: React.FC<AiVisualizerProps> = ({ project }) => {
                   >
                     <img src={r.url} alt={r.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     {/* Official Letterhead Firm Logo Badge */}
-                    <div className="absolute top-1.5 left-1.5 w-4 h-4 rounded bg-black/80 border border-[#2DD4BF]/60 p-0.5 overflow-hidden shadow pointer-events-none">
+                    <div className="absolute top-1.5 left-1.5 w-4 h-4 flex items-center justify-center pointer-events-none">
                       <img
                         src={APP_LOGO}
                         onError={(e) => {

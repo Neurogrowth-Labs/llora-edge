@@ -27,6 +27,10 @@ import { ClientModeView } from './components/ClientModeView';
 import { DataStateInspectorModal } from './components/DataStateInspectorModal';
 import { LivingDigitalTwinStudio } from './components/LivingDigitalTwinStudio';
 import { evaluateBuildingIntelligenceScore } from './services/buildingIntelligenceEngine';
+import { ArchitectProfile, DEFAULT_ARCHITECT_PROFILE, loadSavedProfile, saveProfile } from './types/auth';
+import { SignUpView } from './components/auth/SignUpView';
+import { SignInView } from './components/auth/SignInView';
+import { ArchitectOnboardingModal } from './components/auth/ArchitectOnboardingModal';
 import {
   Layers,
   Box,
@@ -76,6 +80,49 @@ export function App() {
   const [isDesignDnaOpen, setIsDesignDnaOpen] = useState<boolean>(false);
   const [isClientModeActive, setIsClientModeActive] = useState<boolean>(false);
   const [isDataStateInspectorOpen, setIsDataStateInspectorOpen] = useState<boolean>(false);
+
+  // Architectural Identity, Authentication & Studio Calibration State
+  const [authView, setAuthView] = useState<'studio' | 'sign_up' | 'sign_in' | 'onboarding'>('sign_in');
+  const [architectProfile, setArchitectProfile] = useState<ArchitectProfile>(() => loadSavedProfile());
+
+  const handleSignUpComplete = (newProfile: ArchitectProfile) => {
+    setArchitectProfile(newProfile);
+    saveProfile(newProfile);
+    // Proceed directly into the 10-step studio calibration onboarding
+    setAuthView('onboarding');
+  };
+
+  const handleSignInSuccess = (profileData: Partial<ArchitectProfile>) => {
+    setArchitectProfile((prev) => {
+      const updated = { ...prev, ...profileData, isLoggedIn: true };
+      saveProfile(updated);
+      return updated;
+    });
+    setAuthView('studio');
+  };
+
+  const handleSignOut = () => {
+    setArchitectProfile((prev) => {
+      const updated = { ...prev, isLoggedIn: false };
+      saveProfile(updated);
+      return updated;
+    });
+    setAuthView('sign_in');
+  };
+
+  const handleOnboardingComplete = (updatedProfile: ArchitectProfile) => {
+    setArchitectProfile(updatedProfile);
+    saveProfile(updatedProfile);
+    // Dynamically synchronize the project metadata & letterhead with the configured studio
+    if (updatedProfile.studioName) {
+      setProject((prev) => ({
+        ...prev,
+        companyName: updatedProfile.studioName,
+        architectName: updatedProfile.fullName,
+      }));
+    }
+    setAuthView('studio');
+  };
 
   // Granular UI Header & Footer Visibility (Top Header is ALWAYS visible)
   const [showRibbonBar, setShowRibbonBar] = useState<boolean>(true);
@@ -455,6 +502,24 @@ export function App() {
   // Live evaluated intelligence score
   const liveScore = evaluateBuildingIntelligenceScore(project);
 
+  if (authView === 'sign_up') {
+    return (
+      <SignUpView
+        onSignUpComplete={handleSignUpComplete}
+        onNavigateToSignIn={() => setAuthView('sign_in')}
+      />
+    );
+  }
+
+  if (authView === 'sign_in') {
+    return (
+      <SignInView
+        onSignInSuccess={handleSignInSuccess}
+        onNavigateToSignUp={() => setAuthView('sign_up')}
+      />
+    );
+  }
+
   if (isClientModeActive) {
     return (
       <ClientModeView
@@ -492,6 +557,11 @@ export function App() {
         onOpenDesignDna={() => setIsDesignDnaOpen(true)}
         onOpenClientMode={() => setIsClientModeActive(true)}
         onOpenDataStateInspector={() => setIsDataStateInspectorOpen(true)}
+        architectProfile={architectProfile}
+        onOpenSignIn={() => setAuthView('sign_in')}
+        onOpenSignUp={() => setAuthView('sign_up')}
+        onOpenOnboarding={() => setAuthView('onboarding')}
+        onSignOut={handleSignOut}
         activeTool={activeTool}
         setActiveTool={setActiveTool}
         activeLevelId={activeLevelId}
@@ -718,6 +788,15 @@ export function App() {
         isOpen={isMaterialsOpen}
         onClose={() => setIsMaterialsOpen(false)}
       />
+
+      {/* 10-STEP ARCHITECT STUDIO CALIBRATION MODAL */}
+      {authView === 'onboarding' && (
+        <ArchitectOnboardingModal
+          initialProfile={architectProfile}
+          onComplete={handleOnboardingComplete}
+          onCancel={() => setAuthView('studio')}
+        />
+      )}
     </div>
   );
 }

@@ -27,7 +27,7 @@ export const PresentationMode: React.FC<PresentationModeProps> = ({ project, onE
       {/* Top Presentation Bar */}
       <div className="h-16 border-b border-[#222222] px-6 flex items-center justify-between bg-[#0A0A0A]">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-[#05070B] border border-[#2DD4BF]/50 p-1 flex items-center justify-center shadow-md overflow-hidden">
+          <div className="w-10 h-10 flex items-center justify-center">
             <img
               src={APP_LOGO}
               onError={(e) => {
@@ -107,7 +107,7 @@ export const PresentationMode: React.FC<PresentationModeProps> = ({ project, onE
                 {/* Letterhead Overlay */}
                 <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10 pointer-events-none">
                   <div className="bg-[#05070B]/90 backdrop-blur-md border border-[#2DD4BF]/50 rounded-lg p-2.5 flex items-center gap-3 shadow-2xl">
-                    <div className="w-9 h-9 rounded bg-[#0A0E17] border border-[#2DD4BF]/60 p-0.5 flex-shrink-0 flex items-center justify-center overflow-hidden shadow">
+                    <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center">
                       <img
                         src={APP_LOGO}
                         onError={(e) => {

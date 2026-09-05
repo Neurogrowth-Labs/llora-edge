@@ -78,21 +78,8 @@ export async function stampLetterheadOnImage(
     const logoY = logoPadding;
 
     if (logoImg) {
-      // Draw rounded container / subtle shadow for logo
-      ctx.save();
-      ctx.beginPath();
-      const radius = 6;
-      ctx.roundRect(logoX, logoY, logoSize, logoSize, radius);
-      ctx.clip();
+      // Draw transparent logo directly with no borders
       ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-      ctx.restore();
-
-      // Border around logo
-      ctx.strokeStyle = '#2DD4BF88';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.roundRect(logoX, logoY, logoSize, logoSize, 6);
-      ctx.stroke();
     }
 
     // Text metrics & typography

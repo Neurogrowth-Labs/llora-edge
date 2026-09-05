@@ -69,8 +69,10 @@ import {
   RefreshCw,
   Clock,
   CheckSquare,
+  LogOut,
 } from 'lucide-react';
 import { ArchitecturalProject, DrawingTool, Level } from '../types/architecture';
+import { ArchitectProfile } from '../types/auth';
 import { SAMPLE_PROJECTS } from '../data/sampleProjects';
 import { DataStateBadge } from './DataStateBadge';
 import { APP_LOGO, APP_LOGO_STATIC_URL } from '../assets/logo';
@@ -123,6 +125,12 @@ interface CadStyleHeaderProps {
   onOpenDesignDna: () => void;
   onOpenClientMode: () => void;
   onOpenDataStateInspector?: () => void;
+  // Architect Profile & Studio Auth
+  architectProfile?: ArchitectProfile;
+  onOpenSignIn?: () => void;
+  onOpenSignUp?: () => void;
+  onOpenOnboarding?: () => void;
+  onSignOut?: () => void;
   // CAD Tools & Navigation
   activeTool: DrawingTool;
   setActiveTool: (tool: DrawingTool) => void;
@@ -169,6 +177,11 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
   onOpenDesignDna,
   onOpenClientMode,
   onOpenDataStateInspector,
+  architectProfile,
+  onOpenSignIn,
+  onOpenSignUp,
+  onOpenOnboarding,
+  onSignOut,
   activeTool,
   setActiveTool,
   activeLevelId,
@@ -372,7 +385,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
               className="h-7 pl-1.5 pr-2 bg-gradient-to-br from-[#0D9488] to-[#0F766E] hover:from-[#14B8A6] hover:to-[#0D9488] text-white font-black text-xs rounded flex items-center gap-1.5 shadow-md shadow-[#0D9488]/30 transition transform active:scale-95 border border-[#2DD4BF]/40"
               title="Lora Edge Application Menu"
             >
-              <div className="w-5 h-5 rounded bg-black/40 border border-white/20 overflow-hidden flex items-center justify-center">
+              <div className="w-5 h-5 flex items-center justify-center">
                 <img
                   src={APP_LOGO}
                   onError={(e) => {
@@ -390,7 +403,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
               <div className="absolute top-8 left-0 w-80 bg-[#0C0C0C] border border-[#262626] rounded-lg shadow-2xl z-50 py-1 text-xs text-gray-200 backdrop-blur-xl animate-in fade-in duration-100">
                 <div className="px-3 py-2 border-b border-[#1F1F1F] bg-[#141414] flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded bg-[#05070B] border border-[#2DD4BF]/50 p-0.5 flex items-center justify-center overflow-hidden shadow">
+                    <div className="w-8 h-8 flex items-center justify-center">
                       <img
                         src={APP_LOGO}
                         onError={(e) => {
@@ -511,7 +524,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
 
           {/* APPLICATION LOGO / PRODUCT NAME */}
           <div className="flex items-center gap-2 px-2 border-r border-[#1F1F1F]">
-            <div className="w-5 h-5 rounded bg-[#0A0E17] border border-[#2DD4BF]/50 p-0.5 flex items-center justify-center overflow-hidden shadow-sm">
+            <div className="w-5 h-5 flex items-center justify-center">
               <img
                 src={APP_LOGO}
                 onError={(e) => {
@@ -853,28 +866,84 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
             <HelpCircle className="w-3.5 h-3.5" />
           </button>
 
-          {/* USER ACCOUNT / PROFILE */}
+          {/* USER ACCOUNT / ARCHITECTURAL IDENTITY */}
           <div className="relative">
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="flex items-center gap-1.5 pl-1.5 pr-2 py-0.5 bg-[#121212] hover:bg-[#1C1C1C] border border-[#262626] rounded text-[11px] text-gray-200 transition"
-              title="Architect User Account"
+              className="flex items-center gap-1.5 pl-1.5 pr-2 py-0.5 bg-[#121212] hover:bg-[#1C1C1C] border border-[#262626] hover:border-[#2DD4BF]/50 rounded text-[11px] text-gray-200 transition"
+              title="Architect User Account & Studio Settings"
             >
-              <div className="w-4 h-4 rounded-full bg-[#2DD4BF] text-black font-bold text-[9px] flex items-center justify-center">
-                S
+              <div className="w-4 h-4 rounded-full bg-[#2DD4BF] text-black font-bold text-[9px] flex items-center justify-center uppercase">
+                {(architectProfile?.fullName || 'Simao').charAt(0)}
               </div>
-              <span className="hidden md:inline font-semibold">Simao</span>
+              <span className="hidden md:inline font-semibold">
+                {architectProfile?.fullName?.split(' ')[0] || 'Simao'}
+              </span>
               <ChevronDown className="w-2.5 h-2.5 text-gray-400" />
             </button>
 
             {isUserMenuOpen && (
-              <div className="absolute top-7 right-0 w-56 bg-[#0E0E0E] border border-[#262626] rounded-lg shadow-2xl z-50 py-1.5 text-xs">
+              <div className="absolute top-7 right-0 w-64 bg-[#0E0E0E] border border-[#262626] rounded-lg shadow-2xl z-50 py-1.5 text-xs">
                 <div className="px-3 py-2 border-b border-[#1F1F1F]">
-                  <div className="font-bold text-white">Simao Lusimadio</div>
-                  <div className="text-[10px] text-[#2DD4BF]">Senior BIM Architect Lead</div>
-                  <div className="text-[9px] text-gray-500 font-mono mt-0.5">SACAP Reg. No. 2026-4829</div>
+                  <div className="font-bold text-white flex items-center justify-between">
+                    <span>{architectProfile?.fullName || 'Simao Lusimadio'}</span>
+                    <span className="text-[9px] font-mono text-[#2DD4BF] bg-[#2DD4BF]/10 px-1 py-0.5 rounded border border-[#2DD4BF]/20">
+                      IFC 4.3
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-[#2DD4BF] truncate">
+                    {architectProfile?.studioName || 'LORA ARCHITECTURAL & BIM STUDIO'}
+                  </div>
+                  <div className="text-[9px] text-gray-500 font-mono mt-0.5">
+                    {architectProfile?.roles?.join(', ') || 'Senior BIM Architect Lead'} • SACAP Reg. 2026-4829
+                  </div>
                 </div>
+
                 <div className="py-1">
+                  {onOpenOnboarding && (
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        onOpenOnboarding();
+                      }}
+                      className="w-full px-3 py-1.5 text-left flex items-center gap-2 hover:bg-[#1A1A1A] text-white font-medium"
+                    >
+                      <Sliders className="w-3.5 h-3.5 text-[#2DD4BF]" />
+                      <div className="flex-1">
+                        <div>Calibrate Studio (10 Steps)</div>
+                        <div className="text-[10px] text-gray-400">Reconfigure workspace parameters</div>
+                      </div>
+                    </button>
+                  )}
+
+                  {onOpenSignUp && (
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        onOpenSignUp();
+                      }}
+                      className="w-full px-3 py-1.5 text-left flex items-center gap-2 hover:bg-[#1A1A1A] text-gray-300"
+                    >
+                      <Workflow className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>Create Architectural Identity</span>
+                    </button>
+                  )}
+
+                  {onOpenSignIn && (
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        onOpenSignIn();
+                      }}
+                      className="w-full px-3 py-1.5 text-left flex items-center gap-2 hover:bg-[#1A1A1A] text-gray-300"
+                    >
+                      <Radio className="w-3.5 h-3.5 text-teal-400" />
+                      <span>Enter Studio (Sign In)</span>
+                    </button>
+                  )}
+
+                  <div className="my-1 border-t border-[#1F1F1F]" />
+
                   <button
                     onClick={() => {
                       setIsUserMenuOpen(false);
@@ -895,6 +964,35 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
                     <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
                     <span>Building Intelligence Score</span>
                   </button>
+
+                  {onOpenSignIn && (
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        onOpenSignIn();
+                      }}
+                      className="w-full px-3 py-1.5 text-left flex items-center gap-2 hover:bg-[#1A1A1A] text-gray-300 hover:text-[#D4AF37] transition"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span>Play Cinematic Sequence</span>
+                    </button>
+                  )}
+
+                  {onSignOut && (
+                    <>
+                      <div className="my-1 border-t border-[#1F1F1F]" />
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          onSignOut();
+                        }}
+                        className="w-full px-3 py-1.5 text-left flex items-center gap-2 hover:bg-[#1A1A1A] text-rose-400 hover:text-rose-300 transition"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>Lock Studio & Sign Out</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )}
