@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    border-color: #222222;
+  }
+  body {
+    background-color: #050505;
+    color: #e0e0e0;
+  }
+}
+
+/* Custom CAD Grid Patterns - Elegant Dark */
+.bg-cad-dots {
+  background-color: #0f0f0f;
+  background-image: radial-gradient(#222222 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-cad-grid {
+  background-color: #0a0a0a;
+  background-size: 24px 24px, 120px 120px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to right, rgba(45, 212, 191, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(45, 212, 191, 0.08) 1px, transparent 1px);
+}
+
+.bg-cad-grid-light {
+  background-color: #111111;
+  background-size: 20px 20px, 100px 100px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+}
+
+.bg-cad-blueprint {
+  background-color: #050505;
+  background-size: 24px 24px, 120px 120px;
+  background-image: 
+    linear-gradient(to right, rgba(45, 212, 191, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(45, 212, 191, 0.05) 1px, transparent 1px),
+    linear-gradient(to right, rgba(45, 212, 191, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(45, 212, 191, 0.15) 1px, transparent 1px);
+}
+
+/* Custom Scrollbars for tool palettes */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+/* Print Styles for Architectural Documentation */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+
+
