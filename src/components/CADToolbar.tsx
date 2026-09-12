@@ -216,7 +216,7 @@ export const CADToolbar: React.FC<CADToolbarProps> = ({
         </div>
       </div>
 
-      {/* Right: Floor Level Switcher & AI Assist Trigger */}
+      {/* Right: Floor Level Switcher & Design Assist Trigger */}
       <div className="flex items-center gap-2">
         {/* Level Switcher */}
         <div className="flex items-center bg-[#141414] px-2.5 py-1 rounded-md border border-[#222222] gap-1.5 text-xs">
@@ -241,13 +241,13 @@ export const CADToolbar: React.FC<CADToolbarProps> = ({
           </button>
         </div>
 
-        {/* Quick AI Design Copilot button */}
+        {/* Quick Design Assistant button */}
         <button
           id="btn-trigger-ai-copilot"
           onClick={onOpenAiCopilot}
           className="flex items-center px-3 py-1.5 rounded bg-[#2DD4BF] text-[#050505] font-bold text-xs shadow-md shadow-[#2DD4BF]/20 hover:brightness-110 active:scale-95 transition"
         >
-          <span>AI COPILOT</span>
+          <span>DESIGN ASSISTANT</span>
         </button>
       </div>
     </div>

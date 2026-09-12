@@ -1197,14 +1197,14 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
           })}
         </div>
 
-        {/* Right Action: Generate Photorealistic AI Render CTA */}
+        {/* Right Action: Generate Photorealistic Design Render CTA */}
         {onOpenAiRender && (
           <button
             onClick={onOpenAiRender}
             className="bg-[#2DD4BF] hover:brightness-110 text-[#050505] font-bold text-xs py-2 px-3.5 rounded-lg shadow-lg shadow-[#2DD4BF]/20 flex items-center gap-2 pointer-events-auto transition active:scale-95 shrink-0"
           >
             <Sparkles className="w-4 h-4" />
-            <span className="hidden sm:inline">AI Photorealistic Render</span>
+            <span className="hidden sm:inline">Design Photorealistic Render</span>
           </button>
         )}
       </div>

@@ -168,7 +168,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
     }, 1200);
   };
 
-  // Trigger AI Material Scanner
+  // Trigger Design Material Scanner
   const handleTriggerMaterialScanner = () => {
     setIsScanningMaterial(true);
     setTimeout(() => {
@@ -204,7 +204,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
               </span>
             </div>
             <p className="text-xs text-gray-400">
-              Continuously synchronized physical construction site model • 9 Spatial AI Agents active • Circular Material Passport
+              Continuously synchronized physical construction site model • 9 Spatial Design Agents active • Circular Material Passport
             </p>
           </div>
         </div>
@@ -238,10 +238,10 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
         {[
           { id: 'overview', label: '1. Twin Dashboard', icon: Activity },
           { id: 'reality_capture', label: '2. Scan-to-BIM / Reality', icon: Scan },
-          { id: 'material_passport', label: '3. Material Passport & AI Scanner', icon: Sparkles },
-          { id: 'demolition_sim', label: '4. AI Demolition Simulator', icon: Hammer },
+          { id: 'material_passport', label: '3. Material Passport & Design Scanner', icon: Sparkles },
+          { id: 'demolition_sim', label: '4. Design Demolition Simulator', icon: Hammer },
           { id: 'generative_opt', label: '5. Generative Site Optioneering', icon: Box },
-          { id: 'clash_radar', label: '6. AI Clash 2.0 & Risk Radar', icon: ShieldAlert },
+          { id: 'clash_radar', label: '6. Design Clash 2.0 & Risk Radar', icon: ShieldAlert },
           { id: 'timeline_4d', label: '7. 4D Timeline & What-If', icon: Calendar },
           { id: 'robot_fleet', label: '8. Robotics Command & Waste', icon: Bot },
           { id: 'ar_inspector', label: '9. AR Inspector & Site QA', icon: Camera },
@@ -340,7 +340,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
                   <span className="text-xs text-rose-400 font-bold">ZAR at Risk</span>
                 </div>
                 <p className="text-[10px] text-gray-400 mt-2">
-                  Mitigated via AI Spatial clash resolution
+                  Mitigated via Design Spatial clash resolution
                 </p>
               </div>
 
@@ -560,7 +560,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
               </div>
               <ChevronRight className="w-4 h-4 text-[#2DD4BF]" />
               <div className="text-center px-4 py-2 bg-[#141414] rounded-lg border border-[#282828] min-w-[140px]">
-                <div className="font-bold text-white">2. AI Vectorize</div>
+                <div className="font-bold text-white">2. Design Vectorize</div>
                 <div className="text-[10px] text-gray-400">Point Cloud Segmentation</div>
               </div>
               <ChevronRight className="w-4 h-4 text-[#2DD4BF]" />
@@ -619,7 +619,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
         )}
 
         {/* ========================================================= */}
-        {/* TAB 3: MATERIAL PASSPORT & AI SCANNER */}
+        {/* TAB 3: MATERIAL PASSPORT & Design SCANNER */}
         {/* ========================================================= */}
         {activeTab === 'material_passport' && (
           <div className="space-y-6 max-w-6xl mx-auto">
@@ -642,7 +642,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
                   className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-purple-600/20 transition disabled:opacity-50"
                 >
                   <Camera className="w-4 h-4" />
-                  <span>{isScanningMaterial ? 'Scanning Material...' : 'Trigger AI Material Vision Scanner'}</span>
+                  <span>{isScanningMaterial ? 'Scanning Material...' : 'Trigger Design Material Vision Scanner'}</span>
                 </button>
               </div>
             </div>
@@ -651,7 +651,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
               <div className="p-3 bg-purple-950/30 border border-purple-500/40 rounded-xl text-xs text-purple-200 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-purple-400" />
-                  <span><strong>AI Vision Scanner Output:</strong> {scannerMaterialDetected}</span>
+                  <span><strong>Design Vision Scanner Output:</strong> {scannerMaterialDetected}</span>
                 </div>
                 <button
                   onClick={() => setScannerMaterialDetected(null)}
@@ -662,7 +662,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
               </div>
             )}
 
-            {/* Material Inventory Table (Distinguishing AI Estimate vs Verified) */}
+            {/* Material Inventory Table (Distinguishing Design Estimate vs Verified) */}
             <div className="bg-[#0E0E0E] border border-[#222] rounded-xl overflow-hidden">
               <div className="p-4 border-b border-[#1F1F1F] flex items-center justify-between">
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">
@@ -695,7 +695,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
                         <td className="py-3 px-4">
                           <DataStateBadge
                             state={mat.isVerified ? 'VERIFIED' : 'ESTIMATED'}
-                            label={mat.isVerified ? 'MEASURED' : 'AI ESTIMATE'}
+                            label={mat.isVerified ? 'MEASURED' : 'Design ESTIMATE'}
                             size="xs"
                           />
                         </td>
@@ -730,7 +730,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
         )}
 
         {/* ========================================================= */}
-        {/* TAB 4: AI DEMOLITION PLANNER & SCENARIOS */}
+        {/* TAB 4: Design DEMOLITION PLANNER & SCENARIOS */}
         {/* ========================================================= */}
         {activeTab === 'demolition_sim' && (
           <div className="space-y-6 max-w-6xl mx-auto">
@@ -738,7 +738,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
               <div>
                 <h2 className="text-lg font-black text-white flex items-center gap-2">
                   <Hammer className="w-5 h-5 text-amber-400" />
-                  <span>AI Demolition & Selective Deconstruction Simulator</span>
+                  <span>Design Demolition & Selective Deconstruction Simulator</span>
                 </h2>
                 <p className="text-xs text-gray-400 mt-1 max-w-2xl">
                   Simulate multi-variable demolition scenarios. Compare mechanical shearing vs selective unbolting vs hybrid autonomous robotic demolition across cost, timeline, carbon emissions, and safety risk.
@@ -967,7 +967,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
         )}
 
         {/* ========================================================= */}
-        {/* TAB 6: AI CLASH DETECTION 2.0 & RISK RADAR */}
+        {/* TAB 6: Design CLASH DETECTION 2.0 & RISK RADAR */}
         {/* ========================================================= */}
         {activeTab === 'clash_radar' && (
           <div className="space-y-6 max-w-6xl mx-auto">
@@ -975,7 +975,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
               <div>
                 <h2 className="text-lg font-black text-white flex items-center gap-2">
                   <ShieldAlert className="w-5 h-5 text-rose-400" />
-                  <span>AI Clash Detection 2.0 & Spatial Risk Engine</span>
+                  <span>Design Clash Detection 2.0 & Spatial Risk Engine</span>
                 </h2>
                 <p className="text-xs text-gray-400 mt-1 max-w-2xl">
                   Transcend basic geometry pipe-vs-beam clash detection. Unifies crane swing arcs, worker safety envelopes, robot navigation hazards, trade scheduling concurrency, and material logistics bottlenecks.
@@ -1066,7 +1066,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
                   </div>
 
                   <p className="text-xs text-gray-300 bg-[#161616] p-2.5 rounded-lg border border-[#262626]">
-                    <strong>AI Resolution:</strong> {clash.aiSuggestedResolution}
+                    <strong>Design Resolution:</strong> {clash.suggestedResolution}
                   </p>
 
                   <div className="flex items-center justify-between text-[10px] text-gray-400 font-mono pt-1">
@@ -1142,7 +1142,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
                   <Sparkles className="w-4 h-4" />
-                  <span>AI "What-If" Downstream Impact Forecast</span>
+                  <span>Design "What-If" Downstream Impact Forecast</span>
                 </div>
                 <span className="text-xs font-mono text-gray-400">Simulation Engine</span>
               </div>
@@ -1161,7 +1161,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
                   <div className="text-base font-black text-amber-400 font-mono mt-0.5">+R680,000 ZAR</div>
                 </div>
                 <div className="p-3 bg-[#0A0A0A] rounded-lg border border-[#202020]">
-                  <span className="text-[10px] text-gray-400 uppercase font-bold">AI Mitigation</span>
+                  <span className="text-[10px] text-gray-400 uppercase font-bold">Design Mitigation</span>
                   <div className="text-xs font-bold text-[#2DD4BF] mt-0.5">Stagger Zone C MEP First Fix</div>
                 </div>
               </div>

@@ -56,9 +56,9 @@ export const AlternativesComparison: React.FC<AlternativesComparisonProps> = ({
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white tracking-tight">AI Design Alternatives & Trade-Off Matrix</h2>
+              <h2 className="text-xl font-bold text-white tracking-tight">Design Design Alternatives & Trade-Off Matrix</h2>
               <p className="text-xs text-gray-400 mt-1">
-                Lora AI synthesized 5 distinct architectural configurations optimizing spatial volume, capital cost, and EDGE sustainability.
+                Lora Design synthesized 5 distinct architectural configurations optimizing spatial volume, capital cost, and EDGE sustainability.
               </p>
             </div>
           </div>

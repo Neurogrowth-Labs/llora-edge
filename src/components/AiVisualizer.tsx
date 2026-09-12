@@ -231,10 +231,10 @@ export const AiVisualizer: React.FC<AiVisualizerProps> = ({ project }) => {
     }
   };
 
-  // Trigger Gemini AI Render API
+  // Trigger Gemini Design Render API
   const handleGenerateRender = async () => {
     setIsGenerating(true);
-    setStatusMessage('Querying Gemini AI Image Generation Studio...');
+    setStatusMessage('Querying Gemini Design Image Generation Studio...');
 
     const chosenStyle = interiorStyles.find((s) => s.id === interiorStyle) || interiorStyles[0];
     const floorMaterial = activeLevel?.floorFinishMaterial || chosenStyle.floorFinish;
@@ -369,7 +369,7 @@ export const AiVisualizer: React.FC<AiVisualizerProps> = ({ project }) => {
               </div>
               <div>
                 <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                  <span>AI Photorealistic Architectural Render Studio</span>
+                  <span>Design Photorealistic Architectural Render Studio</span>
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-[#2DD4BF]/10 text-[#2DD4BF] border border-[#2DD4BF]/30">
                     Gemini 3.1 Flash Image Engine
                   </span>
@@ -443,7 +443,7 @@ export const AiVisualizer: React.FC<AiVisualizerProps> = ({ project }) => {
             <div className="relative rounded-lg overflow-hidden border border-[#222222] bg-[#0A0A0A] shadow-2xl aspect-[16/10] group">
               <img
                 src={activeRenderUrl}
-                alt="AI Architectural Render"
+                alt="Design Architectural Render"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-101"
                 referrerPolicy="no-referrer"
               />
@@ -788,12 +788,12 @@ export const AiVisualizer: React.FC<AiVisualizerProps> = ({ project }) => {
                 {isGenerating ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Rendering with Gemini AI...</span>
+                    <span>Rendering with Gemini Design...</span>
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    <span>Generate AI {activeCategory === 'interior' ? 'Interior' : 'Exterior'} Render</span>
+                    <span>Generate Design {activeCategory === 'interior' ? 'Interior' : 'Exterior'} Render</span>
                   </>
                 )}
               </button>

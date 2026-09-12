@@ -680,7 +680,7 @@ export function App() {
           <SustainabilityStudio project={project} setProject={setProject} />
         )}
 
-        {/* AI Photorealistic Render Studio */}
+        {/* Design Photorealistic Render Studio */}
         {activeTab === 'render' && <AiVisualizer project={project} />}
 
         {/* Drawing Sheets & Construction Documentation Studio */}

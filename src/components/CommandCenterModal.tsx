@@ -72,7 +72,7 @@ export const CommandCenterModal: React.FC<CommandCenterModalProps> = ({
       setSemanticAnswer(result);
       setAiFeedback(null);
     } else {
-      // Execute as AI Action
+      // Execute as Design Action
       handleExecuteCommand(searchQuery);
     }
   };
@@ -115,7 +115,7 @@ export const CommandCenterModal: React.FC<CommandCenterModalProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Ask the building or give AI architectural commands (e.g. 'What rooms are under 12m²?' or 'Make bedroom 20% larger')..."
+            placeholder="Ask the building or give Design architectural commands (e.g. 'What rooms are under 12m²?' or 'Make bedroom 20% larger')..."
             className="w-full bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none"
             autoFocus
           />
@@ -127,7 +127,7 @@ export const CommandCenterModal: React.FC<CommandCenterModalProps> = ({
 
         {/* Content Body */}
         <div className="p-4 overflow-y-auto space-y-5 text-xs text-[#CCCCCC]">
-          {/* AI Semantic Answer Box if Question was asked */}
+          {/* Design Semantic Answer Box if Question was asked */}
           {semanticAnswer && (
             <div className="p-3.5 bg-[#17252A]/90 border border-[#2DD4BF]/40 rounded-lg space-y-2 animate-in fade-in">
               <div className="flex items-center justify-between">
@@ -147,7 +147,7 @@ export const CommandCenterModal: React.FC<CommandCenterModalProps> = ({
             </div>
           )}
 
-          {/* AI Feedback Box if Action was executed */}
+          {/* Design Feedback Box if Action was executed */}
           {aiFeedback && (
             <div className="p-3 bg-[#14532D]/40 border border-green-500/40 rounded-lg text-green-300 text-xs flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-green-400 shrink-0" />
@@ -180,11 +180,11 @@ export const CommandCenterModal: React.FC<CommandCenterModalProps> = ({
             </div>
           </div>
 
-          {/* Quick AI Architectural Actions */}
+          {/* Quick Design Architectural Actions */}
           <div>
             <div className="flex items-center gap-2 text-gray-400 font-semibold mb-2.5 uppercase tracking-wider text-[11px]">
               <Sparkles className="w-3.5 h-3.5 text-[#2DD4BF]" />
-              <span>Direct AI Architectural Actions (Modifies Model)</span>
+              <span>Direct Design Architectural Actions (Modifies Model)</span>
             </div>
             <div className="space-y-1.5">
               {quickActions.map((action, idx) => (

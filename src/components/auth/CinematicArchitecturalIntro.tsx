@@ -241,7 +241,7 @@ export const CinematicArchitecturalIntro: React.FC<CinematicArchitecturalIntroPr
             <div className="text-[12px] font-medium tracking-[0.25em] text-white uppercase flex items-center gap-2">
               <span>{BRAND_NAME}</span>
               <span className="text-[8px] font-mono tracking-wider text-[#D4AF37] bg-[#D4AF37]/15 px-2 py-0.5 rounded-full">
-                AI STUDIO
+                Design STUDIO
               </span>
             </div>
             <div className="text-[9px] font-mono tracking-widest text-[#94A3B8] uppercase">
@@ -715,7 +715,7 @@ export const CinematicArchitecturalIntro: React.FC<CinematicArchitecturalIntroPr
                     <g className="text-[8px] font-mono fill-gray-400">
                       <text x="475" y="625">EPSG:3857 [WGS84 WORLD MERCATOR]</text>
                       <text x="475" y="638">LAT: 51.5074° N | LNG: 0.1278° W</text>
-                      <text x="475" y="651">AI PARAMETRIC ENGINE: ONLINE</text>
+                      <text x="475" y="651">Design PARAMETRIC ENGINE: ONLINE</text>
                     </g>
 
                     {/* 09: MATERIAL PATTERNS (Timber Louver / Architectural Concrete Hashing) */}

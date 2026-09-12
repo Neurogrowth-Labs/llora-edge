@@ -78,7 +78,7 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
     {
       id: 'msg_0',
       sender: 'assistant',
-      text: `Hello! I am your AI Architectural Copilot. Unlike generic chatbots, I directly understand and modify your parametric BIM model. Give me natural language commands like:\n• "Make the master bedroom 20% larger"\n• "Add structural column to support clear span"\n• "Add ensuite bathroom to master bedroom"\n• "Optimize western façade for Cape Town climate"\n• "Reduce construction cost via modular layout"`,
+      text: `Hello! I am your Architectural Assistant. Unlike generic chatbots, I directly understand and modify your parametric BIM model. Give me natural language commands like:\n- "Make the master bedroom 20% larger"\n- "Add structural column to support clear span"\n- "Add ensuite bathroom to master bedroom"\n- "Optimize western façade for Cape Town climate"\n- "Reduce construction cost via modular layout"`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -135,7 +135,7 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
     setPreviousSnapshot(currentClone);
 
     setTimeout(() => {
-      // Execute structured AI Action modifying the real building model
+      // Execute structured Design Action modifying the real building model
       const { updatedProject, actionLog } = executeAiAction(project, query);
 
       const scoreVal =
@@ -148,8 +148,8 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
         id: `ver_${Date.now()}`,
         versionNumber: (project.versionHistory?.length || versionHistory.length) + 1,
         timestamp: new Date().toISOString(),
-        name: `AI Action: ${actionLog.title}`,
-        author: 'AI Copilot (Lora)',
+        name: `Design Action: ${actionLog.title}`,
+        author: 'Design Assistant (Lora)',
         changeSummary: actionLog.explanation.whatChanged,
         modelSnapshot: JSON.parse(JSON.stringify(updatedProject)),
         metrics: {
@@ -195,6 +195,19 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
       setMessages((prev) => [...prev, revertMsg]);
       setPreviousSnapshot(null);
     }
+  };
+
+  const handleAcceptDesign = () => {
+    setPreviousSnapshot(null);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `ack_${Date.now()}`,
+        sender: 'assistant',
+        text: 'Design change accepted and retained in the project timeline.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      },
+    ]);
   };
 
   // Version History Operations
@@ -274,7 +287,7 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
           <div className="flex items-center gap-2.5">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold text-white tracking-tight">AI Architectural Copilot</h2>
+                <h2 className="text-sm font-bold text-white tracking-tight">Architectural Assistant</h2>
                 <span className="px-1.5 py-0.5 bg-[#2DD4BF]/20 text-[#2DD4BF] text-[9px] font-mono rounded">
                   Live BIM
                 </span>
@@ -302,7 +315,7 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            <span>AI Copilot Chat</span>
+            <span>Assistant Chat</span>
           </button>
           <button
             onClick={() => setActiveTab('history')}
@@ -318,7 +331,7 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
         </div>
       </div>
 
-      {/* TAB 1: AI COPILOT CHAT */}
+      {/* TAB 1: Design COPILOT CHAT */}
       {activeTab === 'chat' && (
         <>
           {/* Messages List */}
@@ -334,7 +347,7 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
                   {msg.sender === 'user' ? (
                     <span>Architect</span>
                   ) : (
-                    <span>Lora AI Building Brain</span>
+                    <span>Lora Design Building Brain</span>
                   )}
                   <span>•</span>
                   <span>{msg.timestamp}</span>
@@ -349,7 +362,7 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
                 >
                   <p className="whitespace-pre-line">{msg.text}</p>
 
-                  {/* EXPLAINABLE AI "WHY?" CARD */}
+                  {/* EXPLAINABLE Design "WHY?" CARD */}
                   {msg.explanation && (
                     <div className="mt-3 pt-3 border-t border-[#262626] space-y-2 text-[11px]">
                       <div className="flex items-center justify-between text-[#2DD4BF] font-bold">
@@ -403,7 +416,7 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({
                       {/* Decision Controls: Accept / Reject */}
                       <div className="pt-2 flex items-center gap-2">
                         <button
-                          onClick={() => {}}
+                          onClick={handleAcceptDesign}
                           className="px-3 py-1 bg-[#14532D]/40 hover:bg-[#14532D]/70 border border-green-500/40 rounded text-green-300 font-semibold text-[10px] flex items-center gap-1 transition"
                         >
                           <Check className="w-3 h-3" />

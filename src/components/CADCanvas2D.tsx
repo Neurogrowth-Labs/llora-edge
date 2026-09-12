@@ -1652,7 +1652,7 @@ export const CADCanvas2D: React.FC<CADCanvas2DProps> = ({
               <h4 className="text-xs font-bold text-white uppercase tracking-wider">Space Validation Warning</h4>
               <p className="text-xs text-gray-300 mt-1 leading-relaxed">{activeWarning.message}</p>
               <div className="mt-2.5 p-2 bg-[#0A0A0A] rounded border border-[#222222] text-[11px] text-[#2DD4BF]">
-                <strong>AI Recommendation:</strong> {activeWarning.suggestedFix}
+                <strong>Design Recommendation:</strong> {activeWarning.suggestedFix}
               </div>
               <div className="mt-3 flex items-center justify-end gap-2">
                 <button
@@ -1669,7 +1669,7 @@ export const CADCanvas2D: React.FC<CADCanvas2DProps> = ({
                     }}
                     className="px-3 py-1 bg-[#2DD4BF] hover:brightness-110 text-[#050505] text-xs font-bold rounded transition"
                   >
-                    Auto-Fix with AI
+                    Auto-Fix with Design
                   </button>
                 )}
               </div>

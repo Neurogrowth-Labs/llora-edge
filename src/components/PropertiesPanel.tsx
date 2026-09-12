@@ -63,7 +63,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             <Compass className="w-4 h-4 text-[#2DD4BF]" />
             <div>
               <h3 className="font-bold text-white uppercase tracking-wider text-[11px]">Project & Site Spatial</h3>
-              <span className="text-[9px] text-gray-400 font-mono">BIM • GIS • Copilot • Setbacks</span>
+              <span className="text-[9px] text-gray-400 font-mono">BIM • GIS • Assistant • Setbacks</span>
             </div>
           </div>
           <div className="flex items-center gap-1.5">
@@ -71,7 +71,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           </div>
         </div>
 
-        {/* Column Sub-Tabs: Spatial Copilot vs Site & BIM Parameters */}
+        {/* Column Sub-Tabs: Spatial Assistant vs Site & BIM Parameters */}
         <div className="flex items-center p-1 bg-[#121212] border-b border-[#222222] shrink-0 gap-1">
           <button
             onClick={() => setSpatialTab('copilot')}
@@ -82,7 +82,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Spatial Copilot</span>
+            <span>Spatial Assistant</span>
           </button>
           <button
             onClick={() => setSpatialTab('params')}
@@ -110,7 +110,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
         ) : (
           /* TAB 2: SITE & BIM PARAMETERS */
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {/* Quick Copilot Jump Banner */}
+            {/* Quick Assistant Jump Banner */}
             <button
               onClick={() => setSpatialTab('copilot')}
               className="w-full p-2.5 rounded-lg bg-gradient-to-r from-[#142322] to-[#161616] border border-[#2DD4BF]/40 hover:border-[#2DD4BF] flex items-center justify-between text-left transition group"
@@ -118,7 +118,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               <div className="flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-[#2DD4BF] group-hover:rotate-12 transition-transform" />
                 <div>
-                  <div className="text-[11px] font-bold text-white">Ask Spatial Copilot</div>
+                  <div className="text-[11px] font-bold text-white">Ask Spatial Assistant</div>
                   <div className="text-[9px] text-gray-400">Demolition scan, circular salvage & robot radar</div>
                 </div>
               </div>
@@ -300,7 +300,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               onClick={() => setSelectedEntity(null)}
               className="text-gray-400 hover:text-white text-xs ml-1"
             >
-              ✕
+              Close
             </button>
           </div>
         </div>
@@ -437,7 +437,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               onClick={() => setSelectedEntity(null)}
               className="text-gray-400 hover:text-white text-xs ml-1"
             >
-              ✕
+              Close
             </button>
           </div>
         </div>
@@ -555,7 +555,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <h3 className="font-bold text-white uppercase tracking-wider text-[11px]">Door Opening Properties</h3>
           <div className="flex items-center gap-1.5">
             <DataStateBadge state="VERIFIED" label="SPEC VERIFIED" size="xs" />
-            <button onClick={() => setSelectedEntity(null)} className="text-gray-400 hover:text-white text-xs ml-1">✕</button>
+            <button onClick={() => setSelectedEntity(null)} className="text-gray-400 hover:text-white text-xs ml-1">Close</button>
           </div>
         </div>
         <div className="p-4 space-y-4">
@@ -618,7 +618,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <h3 className="font-bold text-white uppercase tracking-wider text-[11px]">Window Glazing Properties</h3>
           <div className="flex items-center gap-1.5">
             <DataStateBadge state="VERIFIED" label="SPEC VERIFIED" size="xs" />
-            <button onClick={() => setSelectedEntity(null)} className="text-gray-400 hover:text-white text-xs ml-1">✕</button>
+            <button onClick={() => setSelectedEntity(null)} className="text-gray-400 hover:text-white text-xs ml-1">Close</button>
           </div>
         </div>
         <div className="p-4 space-y-4">

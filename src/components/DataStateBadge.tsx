@@ -59,7 +59,7 @@ const STATE_CONFIGS: Record<
   },
   ESTIMATED: {
     label: 'ESTIMATED',
-    defaultDesc: 'Calculated or AI-generated estimate',
+    defaultDesc: 'Calculated or Design-generated estimate',
     icon: Sparkles,
     bgClass: 'bg-amber-500/10',
     borderClass: 'border-amber-500/30',

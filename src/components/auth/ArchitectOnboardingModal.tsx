@@ -50,7 +50,7 @@ export const ArchitectOnboardingModal: React.FC<ArchitectOnboardingModalProps> =
     initialProfile.experienceLevel || 'professional'
   );
   const [priorities, setPriorities] = useState<string[]>(
-    initialProfile.designPriorities || ['Sustainability', 'Energy efficiency', 'Passive design', 'AI-assisted design']
+    initialProfile.designPriorities || ['Sustainability', 'Energy efficiency', 'Passive design', 'Design-assisted design']
   );
   const [tools, setTools] = useState<string[]>(
     initialProfile.tools || ['Revit', 'Rhino', 'AutoCAD']
@@ -259,7 +259,7 @@ export const ArchitectOnboardingModal: React.FC<ArchitectOnboardingModalProps> =
                 Let's build your studio.
               </h1>
               <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-lg mx-auto">
-                We'll configure your workspace around the way you design, build, and collaborate — synthesizing your design philosophy with real-time BIM and AI models.
+                We'll configure your workspace around the way you design, build, and collaborate — synthesizing your design philosophy with real-time BIM and Design models.
               </p>
             </div>
 
@@ -389,7 +389,7 @@ export const ArchitectOnboardingModal: React.FC<ArchitectOnboardingModalProps> =
                 Where are you in your architectural journey?
               </h2>
               <p className="text-xs sm:text-sm text-gray-400">
-                Calibrates how technical, automated, or prescriptive the AI assistance is across your sheets.
+                Calibrates how technical, automated, or prescriptive the Design assistance is across your sheets.
               </p>
             </div>
 
@@ -467,7 +467,7 @@ export const ArchitectOnboardingModal: React.FC<ArchitectOnboardingModalProps> =
                 What matters most in your architecture?
               </h2>
               <p className="text-xs sm:text-sm text-gray-400">
-                Select 3–5 core design priorities to prioritize in your AI copilot and sustainability scorecards.
+                Select 3–5 core design priorities to prioritize in your design assistant and sustainability scorecards.
               </p>
             </div>
 
@@ -486,7 +486,7 @@ export const ArchitectOnboardingModal: React.FC<ArchitectOnboardingModalProps> =
                 'Climate resilience',
                 'Accessibility',
                 'Parametric design',
-                'AI-assisted design',
+                'Design-assisted design',
               ].map((p) => {
                 const isSelected = priorities.includes(p);
                 return (
@@ -533,7 +533,7 @@ export const ArchitectOnboardingModal: React.FC<ArchitectOnboardingModalProps> =
                 { name: 'Grasshopper', ext: 'Algorithmic' },
                 { name: 'SketchUp', ext: '.skp' },
                 { name: 'Vectorworks', ext: '.vwx' },
-                { name: 'Adobe Suite', ext: 'Ps / Ai / Id' },
+                { name: 'Adobe Suite', ext: 'Ps / Id' },
                 { name: 'Blender', ext: 'Cycles / OBJ' },
                 { name: 'Other BIM', ext: 'OpenBIM' },
               ].map((tool) => {
@@ -693,12 +693,12 @@ export const ArchitectOnboardingModal: React.FC<ArchitectOnboardingModalProps> =
           </div>
         )}
 
-        {/* STEP 09 — AI Design Preferences */}
+        {/* STEP 09 — Design Design Preferences */}
         {step === 9 && (
           <div className="space-y-6 animate-fadeIn">
             <div className="text-center space-y-2">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                How should your AI work with you?
+                How should your Design work with you?
               </h2>
               <p className="text-xs sm:text-sm text-gray-400">
                 Calibrate the intelligence balance between algorithmic precision and experimental creativity.
@@ -709,7 +709,7 @@ export const ArchitectOnboardingModal: React.FC<ArchitectOnboardingModalProps> =
               {/* Slider 1: Creativity */}
               <div>
                 <div className="flex justify-between text-xs font-mono mb-1.5">
-                  <span className="text-gray-300 font-semibold">AI Creativity</span>
+                  <span className="text-gray-300 font-semibold">Design Creativity</span>
                   <span className="text-[#2DD4BF] font-bold">{aiPrefs.creativity}%</span>
                 </div>
                 <input
@@ -850,7 +850,7 @@ export const ArchitectOnboardingModal: React.FC<ArchitectOnboardingModalProps> =
                   <span className="text-gray-200 font-semibold">{firstProject}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-[10px]">AI CREATIVITY</span>
+                  <span className="text-gray-500 block text-[10px]">Design CREATIVITY</span>
                   <span className="text-[#2DD4BF] font-semibold">{aiPrefs.creativity}%</span>
                 </div>
                 <div>

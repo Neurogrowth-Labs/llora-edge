@@ -34,7 +34,7 @@ export const DEFAULT_ARCHITECT_PROFILE: ArchitectProfile = {
   roles: ['Architect', 'Architectural Technologist'],
   disciplines: ['Residential', 'Sustainable Architecture', 'Commercial'],
   experienceLevel: 'senior',
-  designPriorities: ['Sustainability', 'Energy efficiency', 'Passive design', 'AI-assisted design'],
+  designPriorities: ['Sustainability', 'Energy efficiency', 'Passive design', 'design-assisted workflow'],
   tools: ['Revit', 'Rhino', 'Grasshopper', 'AutoCAD'],
   sustainabilityLevel: 'advanced',
   climateRegion: 'Temperate Oceanic (Cfb)',

@@ -111,7 +111,7 @@ export const CadStyleFooter: React.FC<CadStyleFooterProps> = ({
   const [commandHistory, setCommandHistory] = useState<Array<{ text: string; type: 'cmd' | 'output' | 'system' | 'ai'; time: string }>>([
     { text: 'Lora Edge 2026 Core Architectural Kernel v2.4.8 initialized.', type: 'system', time: '12:00:00' },
     { text: `Active Project: ${project.name} | Climate: ${project.climate.location}`, type: 'system', time: '12:00:01' },
-    { text: 'Type HELP, WALL, DOOR, ROOM, SOLAR, or AI for instant BIM commands.', type: 'output', time: '12:00:02' },
+    { text: 'Type HELP, WALL, DOOR, ROOM, SOLAR, or Design for instant BIM commands.', type: 'output', time: '12:00:02' },
   ]);
 
   // 3 & 4. Model Space vs Paper Space Layout Tabs
@@ -220,7 +220,7 @@ export const CadStyleFooter: React.FC<CadStyleFooterProps> = ({
 
     if (cleanCmd === 'HELP' || cleanCmd === '?') {
       newHistory.push({
-        text: 'AVAILABLE CAD COMMANDS: WALL(W), DOOR(D), WINDOW(G), COLUMN(C), ROOM(R), DIM(M), SELECT(V), 3D, 2D, SNAP, ORTHO, OSNAP, LAYER, AUDIT, COPILOT, CLEAR',
+        text: 'AVAILABLE CAD COMMANDS: WALL(W), DOOR(D), WINDOW(G), COLUMN(C), ROOM(R), DIM(M), SELECT(V), 3D, 2D, SNAP, ORTHO, OSNAP, LAYER, AUDIT, ASSIST, CLEAR',
         type: 'system',
         time,
       });
@@ -265,16 +265,16 @@ export const CadStyleFooter: React.FC<CadStyleFooterProps> = ({
     } else if (cleanCmd === 'AUDIT' || cleanCmd === 'SCORE') {
       onOpenAuditModal();
       newHistory.push({ text: `Building Intelligence Score: ${buildingScore}/100 (Audit Modal Opened)`, type: 'output', time });
-    } else if (cleanCmd === 'AI' || cleanCmd === 'COPILOT') {
+    } else if (cleanCmd === 'Design' || cleanCmd === 'ASSIST') {
       onOpenAiCopilot();
-      newHistory.push({ text: 'AI Architect Copilot drawer opened', type: 'ai', time });
+      newHistory.push({ text: 'Design Architect Assistant drawer opened', type: 'ai', time });
     } else if (cleanCmd === 'CLEAR' || cleanCmd === 'CLS') {
       setCommandHistory([{ text: 'Lora Edge Command Console cleared.', type: 'system', time }]);
       setCommandInput('');
       return;
     } else {
       newHistory.push({
-        text: `Unknown command "${cmd}". Type "HELP" for listing or press Cmd+K for AI search.`,
+        text: `Unknown command "${cmd}". Type "HELP" for listing or press Cmd+K for Design search.`,
         type: 'output',
         time,
       });
@@ -792,10 +792,10 @@ export const CadStyleFooter: React.FC<CadStyleFooterProps> = ({
                   ? 'bg-[#2DD4BF]/20 text-[#2DD4BF] border-[#2DD4BF]/60 shadow-[0_0_8px_rgba(45,212,191,0.25)]'
                   : 'bg-[#0F0F0F] text-gray-400 border-[#2A2A2A] hover:text-white'
               }`}
-              title="Toggle LORA AI Spatial Copilot (In-CAD Grounded Assistant)"
+              title="Toggle LORA Design Spatial Assistant (In-CAD Grounded Assistant)"
             >
               <Sparkles className="w-3 h-3 text-[#2DD4BF]" />
-              <span>SPATIAL COPILOT</span>
+              <span>SPATIAL ASSISTANT</span>
             </button>
           )}
 
