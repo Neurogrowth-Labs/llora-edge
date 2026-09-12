@@ -234,7 +234,7 @@ export const DataStateInspectorModal: React.FC<DataStateInspectorModalProps> = (
               <span className="text-[9px] text-gray-400 mt-1 truncate">
                 {st === 'LIVE' && 'Receiving data'}
                 {st === 'SYNCED' && 'Synchronized'}
-                {st === 'ESTIMATED' && 'AI / Calculated'}
+                {st === 'ESTIMATED' && 'Design / Calculated'}
                 {st === 'VERIFIED' && 'System verified'}
                 {st === 'STALE' && 'Needs update'}
                 {st === 'ERROR' && 'Unavailable'}

@@ -69,7 +69,7 @@ export const SpatialCopilot: React.FC<SpatialCopilotProps> = ({
       id: 'init_1',
       sender: 'agent',
       agentRole: 'ARCHITECT_AGENT',
-      text: `LORA Spatial Copilot connected to Living Digital Twin (BIM + GIS + IoT + Robotics). I directly understand spatial coordinates and execute Natural Language CAD commands.`,
+      text: `LORA Spatial Assistant connected to Living Digital Twin (BIM + GIS + IoT + Robotics). I directly understand spatial coordinates and execute Natural Language CAD commands.`,
       cadActionSummary: `Live Twin active: ${project.walls.length} BIM walls, 4 autonomous robots online, and real-time site GIS synced.`,
       suggestedFollowUps: [
         'Show me all buildings scheduled for demolition within 2 km',
@@ -143,7 +143,7 @@ export const SpatialCopilot: React.FC<SpatialCopilotProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-black text-white tracking-wide">SPATIAL COPILOT</span>
+              <span className="text-[11px] font-black text-white tracking-wide">SPATIAL ASSISTANT</span>
               <span className="px-1.5 py-0.2 bg-[#2DD4BF]/20 text-[#2DD4BF] text-[8px] font-bold rounded font-mono">
                 CAD + TWIN
               </span>
@@ -173,7 +173,7 @@ export const SpatialCopilot: React.FC<SpatialCopilotProps> = ({
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="p-1 hover:bg-[#202020] text-gray-400 hover:text-white rounded transition text-xs font-mono"
-              title={isExpanded ? 'Minimize Spatial Copilot' : 'Expand Spatial Copilot'}
+              title={isExpanded ? 'Minimize Spatial Assistant' : 'Expand Spatial Assistant'}
             >
               {isExpanded ? '▼' : '▲'}
             </button>
@@ -184,7 +184,7 @@ export const SpatialCopilot: React.FC<SpatialCopilotProps> = ({
               className="p-1 hover:bg-[#202020] text-gray-400 hover:text-white rounded transition text-xs font-mono"
               title="Close"
             >
-              ✕
+              Close
             </button>
           )}
         </div>

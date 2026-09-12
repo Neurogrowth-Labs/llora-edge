@@ -140,7 +140,7 @@ export const SignUpView: React.FC<SignUpViewProps> = ({
                   {BRAND_NAME}
                 </span>
                 <span className="text-[9px] font-mono text-[#2DD4BF] bg-[#2DD4BF]/15 px-2 py-0.5 rounded border border-[#2DD4BF]/30 font-semibold tracking-wide">
-                  AI × BIM × EDGE
+                  Design × BIM × EDGE
                 </span>
               </div>
               <div className="text-[10px] text-gray-400 font-mono tracking-wider">
@@ -166,7 +166,7 @@ export const SignUpView: React.FC<SignUpViewProps> = ({
 
           <div className="space-y-4">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.08] font-sans">
-              Architecture × AI <br />
+              Architecture × Design <br />
               <span className="bg-gradient-to-r from-white via-[#E2E8F0] to-[#2DD4BF] bg-clip-text text-transparent">
                 × Sustainability.
               </span>

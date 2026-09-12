@@ -244,7 +244,7 @@ export const RoboticsControlModal: React.FC<RoboticsControlModalProps> = ({ isOp
                   </div>
                   <div className="flex items-center gap-1.5 p-1.5 bg-[#121212] rounded border border-[#1C1C1C]">
                     <DataStateBadge state="ESTIMATED" size="xs" />
-                    <span className="text-[9px] text-gray-400">Calculated or AI estimate</span>
+                    <span className="text-[9px] text-gray-400">Calculated or Design estimate</span>
                   </div>
                   <div className="flex items-center gap-1.5 p-1.5 bg-[#121212] rounded border border-[#1C1C1C]">
                     <DataStateBadge state="VERIFIED" size="xs" />

@@ -8,7 +8,45 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+app.disable("x-powered-by");
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  next();
+});
 app.use(express.json({ limit: "15mb" }));
+
+// Keep the public endpoints predictable under accidental or abusive repeated calls.
+const requestWindows = new Map<string, { count: number; resetAt: number }>();
+const RATE_WINDOW_MS = 60_000;
+const RATE_LIMIT = 30;
+app.use("/api", (req, res, next) => {
+  const key = req.ip || "unknown";
+  const now = Date.now();
+  const entry = requestWindows.get(key);
+  if (!entry || entry.resetAt <= now) {
+    requestWindows.set(key, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return next();
+  }
+  if (entry.count >= RATE_LIMIT) {
+    res.setHeader("Retry-After", Math.ceil((entry.resetAt - now) / 1000));
+    return res.status(429).json({ error: "Too many requests. Please try again shortly." });
+  }
+  entry.count += 1;
+  next();
+});
+
+function boundedText(value: unknown, maxLength = 4000): string {
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+function boundedStringList(value: unknown, maxItems = 20, maxItemLength = 120): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string").slice(0, maxItems).map((item) => item.trim().slice(0, maxItemLength))
+    : [];
+}
 
 // Lazy init Gemini AI
 let aiClient: GoogleGenAI | null = null;
@@ -30,7 +68,6 @@ function getAIClient(): GoogleGenAI | null {
 app.get("/api/health", (_req, res) => {
   res.json({
     status: "ok",
-    hasApiKey: Boolean(process.env.GEMINI_API_KEY),
     timestamp: new Date().toISOString(),
   });
 });
@@ -41,18 +78,36 @@ app.use("/images", express.static(path.join(process.cwd(), "public", "images")))
 // Image proxy endpoint for CORS-safe canvas stamping and letterheading
 app.get("/api/image-proxy", async (req, res) => {
   try {
-    const imageUrl = req.query.url as string;
+    const imageUrl = boundedText(req.query.url, 2048);
     if (!imageUrl) {
       return res.status(400).send("Missing url parameter");
     }
-    const response = await fetch(imageUrl);
+    let url: URL;
+    try {
+      url = new URL(imageUrl);
+    } catch {
+      return res.status(400).send("Invalid image URL");
+    }
+    if (url.protocol !== "https:" || url.hostname !== "images.unsplash.com") {
+      return res.status(403).send("Image host is not allowed");
+    }
+    const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
     if (!response.ok) {
       return res.status(response.status).send("Failed to fetch upstream image");
     }
     const contentType = response.headers.get("content-type") || "image/jpeg";
+    if (!contentType.startsWith("image/")) {
+      return res.status(415).send("Upstream resource is not an image");
+    }
+    const contentLength = Number(response.headers.get("content-length") || 0);
+    if (contentLength > 10 * 1024 * 1024) {
+      return res.status(413).send("Image is too large");
+    }
     res.setHeader("Content-Type", contentType);
-    res.setHeader("Access-Control-Allow-Origin", "*");
     const arrayBuffer = await response.arrayBuffer();
+    if (arrayBuffer.byteLength > 10 * 1024 * 1024) {
+      return res.status(413).send("Image is too large");
+    }
     return res.send(Buffer.from(arrayBuffer));
   } catch (err: any) {
     console.error("Image proxy error:", err);
@@ -63,7 +118,10 @@ app.get("/api/image-proxy", async (req, res) => {
 // AI Architectural Copilot & Floor Plan Interpretation API
 app.post("/api/ai/architect", async (req, res) => {
   try {
-    const { prompt, currentModel, mode } = req.body;
+    const { currentModel } = req.body || {};
+    const prompt = boundedText(req.body?.prompt ?? req.body?.userPrompt);
+    const mode = boundedText(req.body?.mode ?? req.body?.task, 80);
+    if (!prompt) return res.status(400).json({ success: false, error: "A project brief is required." });
     const ai = getAIClient();
 
     if (!ai) {
@@ -225,7 +283,14 @@ function getCuratedArchitecturalRenders(roomType?: string, style?: string, light
 // AI Photorealistic Architectural & Interior Design Image Generation via Gemini
 app.post("/api/ai/render", async (req, res) => {
   try {
-    const { renderPrompt, roomType, style, lighting, materials, viewAngle, projectContext, aspectRatio } = req.body;
+    const { projectContext } = req.body || {};
+    const renderPrompt = boundedText(req.body?.renderPrompt, 5000);
+    const roomType = boundedText(req.body?.roomType, 160);
+    const style = boundedText(req.body?.style, 160);
+    const lighting = boundedText(req.body?.lighting, 160);
+    const materials = boundedStringList(req.body?.materials);
+    const viewAngle = boundedText(req.body?.viewAngle, 160);
+    const aspectRatio = ["1:1", "4:3", "3:4", "16:9", "9:16"].includes(req.body?.aspectRatio) ? req.body.aspectRatio : "16:9";
     const ai = getAIClient();
 
     const fullPrompt =
@@ -286,7 +351,11 @@ app.post("/api/ai/render", async (req, res) => {
 // AI Photorealistic Concept Render Prompt & Visualization Enhancer
 app.post("/api/ai/render-concept", async (req, res) => {
   try {
-    const { prompt, viewType, style, materials, lighting } = req.body;
+    const prompt = boundedText(req.body?.prompt);
+    const viewType = boundedText(req.body?.viewType, 160);
+    const style = boundedText(req.body?.style, 160);
+    const materials = boundedStringList(req.body?.materials);
+    const lighting = boundedText(req.body?.lighting, 160);
     const ai = getAIClient();
 
     if (!ai) {
@@ -329,7 +398,8 @@ Output JSON format:
 // AI Design Review & Code Compliance Engine
 app.post("/api/ai/audit", async (req, res) => {
   try {
-    const { projectData, jurisdiction } = req.body;
+    const projectData = req.body?.projectData && typeof req.body.projectData === "object" ? req.body.projectData : {};
+    const jurisdiction = boundedText(req.body?.jurisdiction, 160);
     const ai = getAIClient();
 
     if (!ai) {

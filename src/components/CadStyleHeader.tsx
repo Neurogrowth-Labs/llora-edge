@@ -348,7 +348,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
     else if (cmd === 'SAVE') handleQuickSave();
     else if (cmd === 'PRINT' || cmd === 'PLOT') onPrintPlot();
     else if (cmd === 'AUDIT' || cmd === 'SCORE') onOpenAuditModal();
-    else if (cmd === 'AI' || cmd === 'COPILOT') onOpenAiCopilot();
+    else if (cmd === 'Design' || cmd === 'COPILOT') onOpenAiCopilot();
     else if (cmd === 'RENDER') setActiveStudioTab('render');
     else {
       // Open general command center with query
@@ -415,7 +415,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
                     </div>
                     <div>
                       <div className="font-bold text-white text-xs">Lora Edge 2026</div>
-                      <div className="text-[10px] text-gray-400">Enterprise AI Architecture & BIM Studio</div>
+                      <div className="text-[10px] text-gray-400">Enterprise Design Architecture & BIM Studio</div>
                     </div>
                   </div>
                   <span className="px-1.5 py-0.5 bg-[#2DD4BF]/20 text-[#2DD4BF] rounded text-[9px] font-mono font-bold">
@@ -672,7 +672,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
           )}
         </div>
 
-        {/* Center: Command / Search Field (InfoCenter Search & AI Commands) */}
+        {/* Center: Command / Search Field (InfoCenter Search & Design Commands) */}
         <div className="flex-1 max-w-xl mx-3">
           <form onSubmit={handleCommandSubmit} className="relative flex items-center">
             <Search className="w-3.5 h-3.5 text-[#2DD4BF] absolute left-2.5 pointer-events-none" />
@@ -687,7 +687,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
               type="button"
               onClick={onOpenCommandCenter}
               className="absolute right-1 px-1.5 py-0.5 bg-[#1F1F1F] hover:bg-[#2A2A2A] rounded text-[9px] font-mono text-gray-400 border border-[#333] flex items-center gap-0.5"
-              title="Universal AI Command Center (Cmd+K)"
+              title="Universal Design Command Center (Cmd+K)"
             >
               <Command className="w-2.5 h-2.5" />
               <span>K</span>
@@ -1121,9 +1121,10 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
           {/* WINDOW CONTROLS (Minimize, Maximize/Restore, Close) */}
           <div className="flex items-center gap-0.5">
             <button
-              onClick={() => {}}
+              onClick={() => window.blur()}
               className="p-1 hover:bg-[#202020] text-gray-400 hover:text-white rounded transition"
-              title="Minimize Window"
+              title="Move focus away from the workspace"
+              aria-label="Move focus away from the workspace"
             >
               <Minus className="w-3 h-3" />
             </button>
@@ -1208,7 +1209,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
                   { id: 'digital_twin', label: 'LIVING TWIN', icon: Activity },
                   { id: 'intelligence', label: 'INTELLIGENCE', icon: Globe },
                   { id: 'sustainability', label: 'ESG / EDGE', icon: Leaf },
-                  { id: 'render', label: 'AI RENDER', icon: Sparkles },
+                  { id: 'render', label: 'Design RENDER', icon: Sparkles },
                   { id: 'docs', label: 'DOCS', icon: FileText },
                 ] as const
               ).map((sTab) => {
@@ -1344,12 +1345,12 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
               </label>
             </div>
 
-            {/* AI Generator CTA */}
+            {/* Design Generator CTA */}
             <button
               onClick={onOpenAiCopilot}
               className="bg-gradient-to-r from-[#0F766E] to-[#0D9488] hover:from-[#14B8A6] hover:to-[#0F766E] text-white px-3 py-1 rounded text-xs font-bold flex items-center shadow"
             >
-              <span>AI Architect Copilot</span>
+              <span>Design Architect Assistant</span>
             </button>
           </div>
         )}
@@ -1512,7 +1513,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
               onClick={() => setActiveStudioTab('render')}
               className="px-2.5 py-1 bg-[#1F1F1F] hover:bg-[#282828] text-cyan-400 rounded text-xs font-semibold flex items-center gap-1.5"
             >
-              <Sparkles className="w-3.5 h-3.5" /> Photorealistic AI Render
+              <Sparkles className="w-3.5 h-3.5" /> Photorealistic Design Render
             </button>
           </div>
         )}

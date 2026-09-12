@@ -117,14 +117,14 @@ export const ProjectCreationModal: React.FC<ProjectCreationModalProps> = ({
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white tracking-tight">Create New AI Architectural Project</h2>
+              <h2 className="text-lg font-bold text-white tracking-tight">Create New Architectural Project</h2>
               <p className="text-xs text-gray-400">
-                Lora AI generates parametric 2D floor plans, 3D BIM models, and EDGE green building metrics from your brief.
+                Create a parametric 2D floor plan, 3D BIM model, and EDGE green building metrics from your brief.
               </p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-white rounded text-sm">
-            ✕
+            Close
           </button>
         </div>
 

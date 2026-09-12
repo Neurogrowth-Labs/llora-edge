@@ -165,7 +165,7 @@ export const DesignReviewModal: React.FC<DesignReviewModalProps> = ({
   };
 
   const handleExportAudit = () => {
-    let audit = `AI ARCHITECTURAL CRITIC & STRUCTURAL CODE COMPLIANCE AUDIT\n`;
+    let audit = `Design ARCHITECTURAL CRITIC & STRUCTURAL CODE COMPLIANCE AUDIT\n`;
     audit += `Project: ${project.name} | Location: ${project.climate.location}\n`;
     audit += `Jurisdiction: ${project.jurisdiction} | Date: ${new Date().toLocaleDateString()}\n`;
     audit += `Total Findings: ${issues.length} (${structuralIssuesCount} Structural)\n\n`;
@@ -193,7 +193,7 @@ export const DesignReviewModal: React.FC<DesignReviewModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-white tracking-tight">
-                  AI Design Critic ("Review My Design")
+                  Design Design Critic ("Review My Design")
                 </h2>
                 <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase rounded border border-amber-500/30">
                   {issues.filter((i) => i.status === 'pending').length} Findings
@@ -267,7 +267,7 @@ export const DesignReviewModal: React.FC<DesignReviewModalProps> = ({
               className="px-3.5 py-1.5 bg-[#2DD4BF] hover:bg-[#22bca6] text-black font-bold rounded transition flex items-center gap-1.5 shadow-md"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Apply All AI Recommendations</span>
+              <span>Apply All Design Recommendations</span>
             </button>
           </div>
         </div>

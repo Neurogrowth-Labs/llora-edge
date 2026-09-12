@@ -82,7 +82,7 @@ export const DesignDnaModal: React.FC<DesignDnaModalProps> = ({
             <div>
               <h2 className="text-base font-bold text-white tracking-tight">Project Design DNA</h2>
               <p className="text-[11px] text-gray-400">
-                Persistent architectural priorities and algorithmic constraints governing AI design decisions
+                Persistent architectural priorities and algorithmic constraints governing Design design decisions
               </p>
             </div>
           </div>
@@ -250,7 +250,7 @@ export const DesignDnaModal: React.FC<DesignDnaModalProps> = ({
         {/* Footer */}
         <div className="p-4 border-t border-[#222] bg-[#141414] flex items-center justify-between">
           <span className="text-[11px] text-gray-500">
-            Updated DNA will automatically align AI suggestions, alternatives, and generative engines.
+            Updated DNA will automatically align Design suggestions, alternatives, and generative engines.
           </span>
           <div className="flex items-center gap-2">
             <button

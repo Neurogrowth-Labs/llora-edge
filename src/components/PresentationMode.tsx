@@ -234,7 +234,7 @@ export const PresentationMode: React.FC<PresentationModeProps> = ({ project, onE
 
           <div className="pt-4 border-t border-[#222222] text-center">
             <span className="text-[10px] text-gray-500 font-mono block">
-              Designed with Lora AI Architectural Platform
+              Designed with Lora Design Architectural Platform
             </span>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { MATERIALS_DATABASE } from '../data/materialsDatabase';
 import { MaterialDef } from '../types/architecture';
 import {
   Layers,
+  X,
   Search,
 } from 'lucide-react';
 
@@ -56,9 +57,7 @@ export const MaterialsCatalog: React.FC<MaterialsCatalogProps> = ({
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-white rounded text-sm">
-            ✕
-          </button>
+          <button onClick={onClose} className="p-2 text-gray-400 hover:text-white rounded text-sm"><X className="w-4 h-4" /></button>
         </div>
 
         {/* Search & Category Filter Bar */}
