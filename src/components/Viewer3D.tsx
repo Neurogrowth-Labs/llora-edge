@@ -29,6 +29,7 @@ import {
   Zap,
   Upload,
   X,
+
 } from 'lucide-react';
 import { bimTextures } from '../services/bimTextures';
 import {
@@ -40,6 +41,7 @@ import {
 import { APP_LOGO, APP_LOGO_STATIC_URL } from '../assets/logo';
 import { downloadBrandedImage } from '../utils/letterheadStamper';
 import { disposeImportedModel, importIfcModel } from '../services/ifcModelImporter';
+
 
 interface Viewer3DProps {
   project: ArchitecturalProject;
@@ -66,6 +68,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
   const [ifcImportError, setIfcImportError] = useState<string | null>(null);
   const [hasImportedIfc, setHasImportedIfc] = useState(false);
 
+
   // Three.js Scene References
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -82,6 +85,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
   const windStreamlinesRef = useRef<THREE.Group | null>(null);
   const waterMeshRef = useRef<THREE.Mesh | null>(null);
   const importedIfcRef = useRef<THREE.Group | null>(null);
+
   const ifcFileInputRef = useRef<HTMLInputElement>(null);
 
   // Orbit & Camera Controls State
@@ -248,6 +252,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
       if (importedIfcRef.current) disposeImportedModel(importedIfcRef.current);
+
       renderer.dispose();
     };
   }, []);
@@ -314,6 +319,22 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
   useEffect(() => {
     buildProject3DGeometry();
   }, [project, activeScenario, isolatedLevel, sectionCutHeight, explodedSpacing, showTrees, showFurniture, activeWeather]);
+
+  useEffect(() => {
+    if (godsEyeContextRef.current) godsEyeContextRef.current.visible = isGodsEyeContextVisible;
+  }, [isGodsEyeContextVisible]);
+
+  useEffect(() => {
+    if (!sceneRef.current) return;
+    if (godsEyeContextRef.current) {
+      sceneRef.current.remove(godsEyeContextRef.current);
+      disposeGodsEyeContext(godsEyeContextRef.current);
+    }
+    const context = createGodsEyeContext(project);
+    context.visible = isGodsEyeContextVisible;
+    sceneRef.current.add(context);
+    godsEyeContextRef.current = context;
+  }, [project]);
 
   // --------------------------------------------------------------------------
   // ATMOSPHERE, SKY, SUN & LIGHTING LOGIC
@@ -1266,6 +1287,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
             <X className="w-4 h-4" />
           </button>
         )}
+
       </div>
 
       {ifcImportError && (

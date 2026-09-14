@@ -38,22 +38,19 @@ export const SignUpView: React.FC<SignUpViewProps> = ({
   const [agreeTerms, setAgreeTerms] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !email) return;
+    if (!fullName || !email || password.length < 12 || !agreeTerms) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      onSignUpComplete({
-        fullName,
-        email,
-        country,
-        primaryDiscipline: discipline,
-        studioName: `${fullName.split(' ')[0].toUpperCase()}'S ARCHITECTURAL STUDIO`,
-        isLoggedIn: true,
-      });
-      setIsSubmitting(false);
-    }, 600);
+    try {
+      const response = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName, email, password }) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || 'Unable to create account.');
+      onSignUpComplete({ fullName, email: payload.user.email, country, primaryDiscipline: discipline, studioName: `${fullName.split(' ')[0].toUpperCase()}'S ARCHITECTURAL STUDIO`, isLoggedIn: true });
+    } catch (error) {
+      console.error('Registration failed', error);
+    } finally { setIsSubmitting(false); }
   };
 
   const handleOAuthSignUp = (provider: 'Google' | 'Microsoft') => {
