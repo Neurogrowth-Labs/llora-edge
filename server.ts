@@ -2,9 +2,7 @@ import express from "express";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 import { convertIfcToGlb, IfcConversionError } from "./server/ifcConversion";
-import { assertProductionConfiguration } from "./server/config";
-import { createSession, hash, passwordHash, passwordMatches, requireAuth, AuthenticatedRequest } from "./server/auth";
-import { db } from "./server/db";
+
 
 assertProductionConfiguration();
 
@@ -25,6 +23,7 @@ app.use(express.json({ limit: "15mb" }));
 
 // Native IFC parsing stays on the server. The browser only handles the GLB
 // returned by IfcOpenShell, which is rendered by the existing Three.js scene.
+
 // Keep the public endpoints predictable under accidental or abusive repeated calls.
 const requestWindows = new Map<string, { count: number; resetAt: number }>();
 const RATE_WINDOW_MS = 60_000;
