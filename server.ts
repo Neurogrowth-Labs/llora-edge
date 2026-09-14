@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
+import { convertIfcToGlb, IfcConversionError } from "./server/ifcConversion";
 
 dotenv.config();
 
@@ -17,6 +18,23 @@ app.use((_req, res, next) => {
   next();
 });
 app.use(express.json({ limit: "15mb" }));
+
+// Native IFC parsing stays on the server. The browser only handles the GLB
+// returned by IfcOpenShell, which is rendered by the existing Three.js scene.
+app.post("/api/ifc/convert", express.raw({ type: "application/octet-stream", limit: "100mb" }), async (req, res) => {
+  try {
+    const encodedName = typeof req.headers["x-file-name"] === "string" ? req.headers["x-file-name"] : "model.ifc";
+    const fileName = decodeURIComponent(encodedName).replace(/[\\/]/g, "_");
+    const model = await convertIfcToGlb(Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0), fileName);
+    res.setHeader("Content-Type", "model/gltf-binary");
+    res.setHeader("Content-Length", model.length);
+    res.setHeader("Cache-Control", "no-store");
+    res.send(model);
+  } catch (error) {
+    const known = error instanceof IfcConversionError;
+    res.status(known ? error.status : 500).json({ error: known ? error.message : "IFC conversion failed." });
+  }
+});
 
 // Keep the public endpoints predictable under accidental or abusive repeated calls.
 const requestWindows = new Map<string, { count: number; resetAt: number }>();
