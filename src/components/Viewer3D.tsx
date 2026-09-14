@@ -27,6 +27,8 @@ import {
   Thermometer,
   Gauge,
   Zap,
+  Upload,
+  X,
 } from 'lucide-react';
 import { bimTextures } from '../services/bimTextures';
 import {
@@ -37,6 +39,7 @@ import {
 } from '../services/weatherBimEngine';
 import { APP_LOGO, APP_LOGO_STATIC_URL } from '../assets/logo';
 import { downloadBrandedImage } from '../utils/letterheadStamper';
+import { disposeImportedModel, importIfcModel } from '../services/ifcModelImporter';
 
 interface Viewer3DProps {
   project: ArchitecturalProject;
@@ -60,6 +63,8 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
   const [showTrees, setShowTrees] = useState<boolean>(true);
   const [showFurniture, setShowFurniture] = useState<boolean>(true);
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
+  const [ifcImportError, setIfcImportError] = useState<string | null>(null);
+  const [hasImportedIfc, setHasImportedIfc] = useState(false);
 
   // Three.js Scene References
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -76,6 +81,8 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
   const snowSystemRef = useRef<THREE.Points | null>(null);
   const windStreamlinesRef = useRef<THREE.Group | null>(null);
   const waterMeshRef = useRef<THREE.Mesh | null>(null);
+  const importedIfcRef = useRef<THREE.Group | null>(null);
+  const ifcFileInputRef = useRef<HTMLInputElement>(null);
 
   // Orbit & Camera Controls State
   const isDraggingRef = useRef<boolean>(false);
@@ -240,6 +247,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
+      if (importedIfcRef.current) disposeImportedModel(importedIfcRef.current);
       renderer.dispose();
     };
   }, []);
@@ -1147,6 +1155,35 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
     }
   };
 
+  const handleIfcFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !sceneRef.current) return;
+
+    setIfcImportError(null);
+    try {
+      const model = await importIfcModel(file);
+      if (importedIfcRef.current) {
+        sceneRef.current.remove(importedIfcRef.current);
+        disposeImportedModel(importedIfcRef.current);
+      }
+      sceneRef.current.add(model);
+      importedIfcRef.current = model;
+      setHasImportedIfc(true);
+    } catch (error) {
+      setIfcImportError(error instanceof Error ? error.message : 'Unable to import IFC model.');
+    }
+  };
+
+  const clearIfcModel = () => {
+    if (!importedIfcRef.current || !sceneRef.current) return;
+    sceneRef.current.remove(importedIfcRef.current);
+    disposeImportedModel(importedIfcRef.current);
+    importedIfcRef.current = null;
+    setHasImportedIfc(false);
+    setIfcImportError(null);
+  };
+
   const activeWeatherConfig = WEATHER_PRESETS[activeWeather];
   const activeScenarioConfig = SCENARIO_DEFINITIONS[activeScenario];
 
@@ -1207,7 +1244,35 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
             <span className="hidden sm:inline">Design Photorealistic Render</span>
           </button>
         )}
+
+        <input ref={ifcFileInputRef} type="file" accept=".ifc,application/x-step" onChange={handleIfcFile} className="hidden" />
+        <button
+          type="button"
+          onClick={() => ifcFileInputRef.current?.click()}
+          className="ml-2 p-2 rounded-lg bg-[#0A0A0A]/95 border border-[#222222] text-gray-300 hover:text-[#2DD4BF] hover:border-[#2DD4BF]/50 pointer-events-auto transition"
+          title="Import IFC model"
+          aria-label="Import IFC model"
+        >
+          <Upload className="w-4 h-4" />
+        </button>
+        {hasImportedIfc && (
+          <button
+            type="button"
+            onClick={clearIfcModel}
+            className="ml-1 p-2 rounded-lg bg-[#0A0A0A]/95 border border-[#222222] text-gray-300 hover:text-rose-400 hover:border-rose-400/50 pointer-events-auto transition"
+            title="Remove imported IFC model"
+            aria-label="Remove imported IFC model"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
+
+      {ifcImportError && (
+        <div role="alert" className="absolute top-16 left-1/2 -translate-x-1/2 z-30 max-w-md rounded-lg border border-rose-400/40 bg-[#0A0A0A]/95 px-3 py-2 text-xs text-rose-200 shadow-xl">
+          {ifcImportError}
+        </div>
+      )}
 
       {/* LEFT FLOATING CONTROL DOCK (Camera Views, Weather System, Floor Isolation) */}
       <div className="absolute top-16 left-4 flex flex-col gap-2.5 pointer-events-none w-64 z-10">
