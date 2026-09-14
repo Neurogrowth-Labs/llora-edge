@@ -29,7 +29,7 @@ import {
   Zap,
   Upload,
   X,
-  Globe2,
+
 } from 'lucide-react';
 import { bimTextures } from '../services/bimTextures';
 import {
@@ -41,7 +41,7 @@ import {
 import { APP_LOGO, APP_LOGO_STATIC_URL } from '../assets/logo';
 import { downloadBrandedImage } from '../utils/letterheadStamper';
 import { disposeImportedModel, importIfcModel } from '../services/ifcModelImporter';
-import { createGodsEyeContext, disposeGodsEyeContext } from '../services/godsEyeView';
+
 
 interface Viewer3DProps {
   project: ArchitecturalProject;
@@ -67,7 +67,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
   const [ifcImportError, setIfcImportError] = useState<string | null>(null);
   const [hasImportedIfc, setHasImportedIfc] = useState(false);
-  const [isGodsEyeContextVisible, setIsGodsEyeContextVisible] = useState(false);
+
 
   // Three.js Scene References
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -85,7 +85,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
   const windStreamlinesRef = useRef<THREE.Group | null>(null);
   const waterMeshRef = useRef<THREE.Mesh | null>(null);
   const importedIfcRef = useRef<THREE.Group | null>(null);
-  const godsEyeContextRef = useRef<THREE.Group | null>(null);
+
   const ifcFileInputRef = useRef<HTMLInputElement>(null);
 
   // Orbit & Camera Controls State
@@ -252,7 +252,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
       if (importedIfcRef.current) disposeImportedModel(importedIfcRef.current);
-      if (godsEyeContextRef.current) disposeGodsEyeContext(godsEyeContextRef.current);
+
       renderer.dispose();
     };
   }, []);
@@ -1287,19 +1287,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
             <X className="w-4 h-4" />
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => setIsGodsEyeContextVisible((visible) => !visible)}
-          className={`ml-1 p-2 rounded-lg bg-[#0A0A0A]/95 border pointer-events-auto transition ${
-            isGodsEyeContextVisible
-              ? 'border-[#2DD4BF] text-[#2DD4BF]'
-              : 'border-[#222222] text-gray-300 hover:text-[#2DD4BF] hover:border-[#2DD4BF]/50'
-          }`}
-          title="Toggle geographic site context"
-          aria-label="Toggle geographic site context"
-        >
-          <Globe2 className="w-4 h-4" />
-        </button>
+
       </div>
 
       {ifcImportError && (
