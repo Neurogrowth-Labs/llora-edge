@@ -1,9 +1,12 @@
 import express from "express";
 import path from "path";
-import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
+import { convertIfcToGlb, IfcConversionError } from "./server/ifcConversion";
+import { assertProductionConfiguration } from "./server/config";
+import { createSession, hash, passwordHash, passwordMatches, requireAuth, AuthenticatedRequest } from "./server/auth";
+import { db } from "./server/db";
 
-dotenv.config();
+assertProductionConfiguration();
 
 const app = express();
 const PORT = 3000;
@@ -14,10 +17,14 @@ app.use((_req, res, next) => {
   res.setHeader("X-Frame-Options", "SAMEORIGIN");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader("Content-Security-Policy", "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: https://images.unsplash.com; connect-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'");
+  if (process.env.NODE_ENV === "production") res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   next();
 });
 app.use(express.json({ limit: "15mb" }));
 
+// Native IFC parsing stays on the server. The browser only handles the GLB
+// returned by IfcOpenShell, which is rendered by the existing Three.js scene.
 // Keep the public endpoints predictable under accidental or abusive repeated calls.
 const requestWindows = new Map<string, { count: number; resetAt: number }>();
 const RATE_WINDOW_MS = 60_000;
@@ -36,6 +43,74 @@ app.use("/api", (req, res, next) => {
   }
   entry.count += 1;
   next();
+});
+
+app.post("/api/auth/register", async (req, res) => {
+  const email = boundedText(req.body?.email, 254).toLowerCase();
+  const password = typeof req.body?.password === "string" ? req.body.password : "";
+  const fullName = boundedText(req.body?.fullName, 160);
+  if (!/^\S+@\S+\.\S+$/.test(email) || password.length < 12 || !fullName) return res.status(400).json({ error: "A valid email, name, and 12-character password are required." });
+  try {
+    const created = await db.query<{ id: string; email: string; role: string }>("INSERT INTO users (email, password_hash, full_name) VALUES ($1,$2,$3) RETURNING id,email,role", [email, passwordHash(password), fullName]);
+    await createSession(res, created.rows[0].id, req);
+    await db.query("INSERT INTO audit_events (user_id, action, target_type, target_id) VALUES ($1,'user.registered','user',$1)", [created.rows[0].id]);
+    return res.status(201).json({ user: created.rows[0] });
+  } catch (error: any) {
+    return res.status(error?.code === "23505" ? 409 : 500).json({ error: error?.code === "23505" ? "An account already exists for this email." : "Unable to create account." });
+  }
+});
+
+app.post("/api/auth/login", async (req, res) => {
+  const email = boundedText(req.body?.email, 254).toLowerCase();
+  const password = typeof req.body?.password === "string" ? req.body.password : "";
+  const account = await db.query<{ id: string; email: string; role: string; password_hash: string }>("SELECT id,email,role,password_hash FROM users WHERE lower(email)=$1 AND deleted_at IS NULL", [email]);
+  if (!account.rows[0] || !passwordMatches(password, account.rows[0].password_hash)) return res.status(401).json({ error: "Invalid email or password." });
+  await createSession(res, account.rows[0].id, req);
+  return res.json({ user: { id: account.rows[0].id, email: account.rows[0].email, role: account.rows[0].role } });
+});
+
+app.post("/api/auth/logout", requireAuth, async (req, res) => {
+  const token = (req.headers.cookie || '').match(/(?:^|; )lora_session=([^;]+)/)?.[1];
+  if (token) await db.query("DELETE FROM sessions WHERE token_hash=$1", [hash(decodeURIComponent(token))]);
+  res.clearCookie(process.env.SESSION_COOKIE_NAME || 'lora_session', { path: '/' });
+  res.status(204).end();
+});
+
+app.get("/api/auth/me", requireAuth, (req: AuthenticatedRequest, res) => res.json({ user: req.user }));
+
+app.get("/api/projects", requireAuth, async (req: AuthenticatedRequest, res) => {
+  const projects = await db.query("SELECT id,name,version,created_at,updated_at FROM projects WHERE owner_id=$1 AND deleted_at IS NULL ORDER BY updated_at DESC", [req.user!.id]);
+  res.json({ projects: projects.rows });
+});
+
+app.put("/api/projects/:id", requireAuth, async (req: AuthenticatedRequest, res) => {
+  const name = boundedText(req.body?.name, 160);
+  const model = req.body?.model;
+  const version = Number(req.body?.version);
+  if (!name || !model || !Number.isInteger(version) || version < 1) return res.status(400).json({ error: "A name, model, and version are required." });
+  const saved = await db.query("UPDATE projects SET name=$1,model=$2,version=version+1,updated_at=now() WHERE id=$3 AND owner_id=$4 AND version=$5 AND deleted_at IS NULL RETURNING id,name,version,updated_at", [name, JSON.stringify(model), req.params.id, req.user!.id, version]);
+  if (!saved.rows[0]) return res.status(409).json({ error: "Project was changed elsewhere or is unavailable." });
+  res.json({ project: saved.rows[0] });
+});
+
+app.post("/api/projects", requireAuth, async (req: AuthenticatedRequest, res) => {
+  const name = boundedText(req.body?.name, 160); const model = req.body?.model;
+  if (!name || !model) return res.status(400).json({ error: "A name and model are required." });
+  const created = await db.query("INSERT INTO projects (owner_id,name,model) VALUES ($1,$2,$3) RETURNING id,name,version,created_at,updated_at", [req.user!.id, name, JSON.stringify(model)]);
+  await db.query("INSERT INTO audit_events (user_id, action, target_type, target_id) VALUES ($1,'project.created','project',$2)", [req.user!.id, created.rows[0].id]);
+  res.status(201).json({ project: created.rows[0] });
+});
+
+app.post("/api/ifc/convert", requireAuth, express.raw({ type: "application/octet-stream", limit: "100mb" }), async (req, res) => {
+  try {
+    const encodedName = typeof req.headers["x-file-name"] === "string" ? req.headers["x-file-name"] : "model.ifc";
+    const fileName = decodeURIComponent(encodedName).replace(/[\\/]/g, "_");
+    const model = await convertIfcToGlb(Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0), fileName);
+    res.setHeader("Content-Type", "model/gltf-binary"); res.setHeader("Content-Length", model.length); res.setHeader("Cache-Control", "no-store"); res.send(model);
+  } catch (error) {
+    const known = error instanceof IfcConversionError;
+    res.status(known ? error.status : 500).json({ error: known ? error.message : "IFC conversion failed." });
+  }
 });
 
 function boundedText(value: unknown, maxLength = 4000): string {
@@ -76,7 +151,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/images", express.static(path.join(process.cwd(), "public", "images")));
 
 // Image proxy endpoint for CORS-safe canvas stamping and letterheading
-app.get("/api/image-proxy", async (req, res) => {
+app.get("/api/image-proxy", requireAuth, async (req, res) => {
   try {
     const imageUrl = boundedText(req.query.url, 2048);
     if (!imageUrl) {
@@ -116,7 +191,7 @@ app.get("/api/image-proxy", async (req, res) => {
 });
 
 // AI Architectural Copilot & Floor Plan Interpretation API
-app.post("/api/ai/architect", async (req, res) => {
+app.post("/api/ai/architect", requireAuth, async (req, res) => {
   try {
     const { currentModel } = req.body || {};
     const prompt = boundedText(req.body?.prompt ?? req.body?.userPrompt);
@@ -281,7 +356,7 @@ function getCuratedArchitecturalRenders(roomType?: string, style?: string, light
 }
 
 // AI Photorealistic Architectural & Interior Design Image Generation via Gemini
-app.post("/api/ai/render", async (req, res) => {
+app.post("/api/ai/render", requireAuth, async (req, res) => {
   try {
     const { projectContext } = req.body || {};
     const renderPrompt = boundedText(req.body?.renderPrompt, 5000);
@@ -349,7 +424,7 @@ app.post("/api/ai/render", async (req, res) => {
 });
 
 // AI Photorealistic Concept Render Prompt & Visualization Enhancer
-app.post("/api/ai/render-concept", async (req, res) => {
+app.post("/api/ai/render-concept", requireAuth, async (req, res) => {
   try {
     const prompt = boundedText(req.body?.prompt);
     const viewType = boundedText(req.body?.viewType, 160);
@@ -396,7 +471,7 @@ Output JSON format:
 });
 
 // AI Design Review & Code Compliance Engine
-app.post("/api/ai/audit", async (req, res) => {
+app.post("/api/ai/audit", requireAuth, async (req, res) => {
   try {
     const projectData = req.body?.projectData && typeof req.body.projectData === "object" ? req.body.projectData : {};
     const jurisdiction = boundedText(req.body?.jurisdiction, 160);

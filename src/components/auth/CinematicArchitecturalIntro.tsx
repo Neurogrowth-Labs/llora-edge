@@ -117,19 +117,18 @@ export const CinematicArchitecturalIntro: React.FC<CinematicArchitecturalIntroPr
     setPhase('signin');
   };
 
-  const handleSignInSubmit = (e: React.FormEvent) => {
+  const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsAuthenticating(true);
     setAuthError(null);
-
-    setTimeout(() => {
-      onSignInSuccess({
-        email: email || 'simao.lusimadio@gmail.com',
-        fullName: email.includes('simao') ? 'Simao Lusimadio' : 'Principal Architectural Director',
-        isLoggedIn: true,
-      });
-      setIsAuthenticating(false);
-    }, 600);
+    try {
+      const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || 'Unable to sign in.');
+      onSignInSuccess({ email: payload.user.email, fullName: payload.user.email.split('@')[0], isLoggedIn: true });
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : 'Unable to sign in.');
+    } finally { setIsAuthenticating(false); }
   };
 
   const handleOAuthSignIn = (provider: 'Google' | 'Microsoft') => {
