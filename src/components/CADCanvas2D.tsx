@@ -8,6 +8,7 @@ import {
   Room,
   Furniture,
   Point2D,
+  DraftingEntity,
   SpaceValidationError,
   Column,
   Stair,
@@ -85,6 +86,8 @@ export const CADCanvas2D: React.FC<CADCanvas2DProps> = ({
   const [drawingStart, setDrawingStart] = useState<Point2D | null>(null);
   const [currentMouseWorld, setCurrentMouseWorld] = useState<Point2D>({ x: 0, y: 0 });
   const [roomDrawingPoints, setRoomDrawingPoints] = useState<Point2D[]>([]);
+  const [draftingStart, setDraftingStart] = useState<Point2D | null>(null);
+  const [polylinePoints, setPolylinePoints] = useState<Point2D[]>([]);
 
   // Hovered elements & Snap system
   const [hoveredWall, setHoveredWall] = useState<Wall | null>(null);
@@ -179,7 +182,28 @@ export const CADCanvas2D: React.FC<CADCanvas2DProps> = ({
         return;
       }
 
-      if (activeTool === 'wall') {
+      const draftingKinds = ['line', 'circle', 'arc', 'rectangle', 'polygon', 'ellipse', 'spline', 'hatch', 'ray', 'xline'] as const;
+      if (activeTool === 'point') {
+        const entity: DraftingEntity = { id: `draft_${Date.now()}`, levelId: project.activeLevelId, kind: 'point', points: [worldPos] };
+        setProject((prev) => ({ ...prev, draftingEntities: [...(prev.draftingEntities || []), entity] }));
+      } else if (activeTool === 'polyline') {
+        // Click successive vertices; click the first vertex to close and finish the PLINE.
+        if (polylinePoints.length >= 2 && Math.hypot(worldPos.x - polylinePoints[0].x, worldPos.y - polylinePoints[0].y) < validGridSize) {
+          const entity: DraftingEntity = { id: `draft_${Date.now()}`, levelId: project.activeLevelId, kind: 'polyline', points: polylinePoints };
+          setProject((prev) => ({ ...prev, draftingEntities: [...(prev.draftingEntities || []), entity] }));
+          setPolylinePoints([]);
+        } else setPolylinePoints((points) => [...points, worldPos]);
+      } else if (draftingKinds.includes(activeTool as typeof draftingKinds[number])) {
+        if (!draftingStart) setDraftingStart(worldPos);
+        else {
+          const radius = Math.hypot(worldPos.x - draftingStart.x, worldPos.y - draftingStart.y);
+          if (radius > 0.01) {
+            const entity: DraftingEntity = { id: `draft_${Date.now()}`, levelId: project.activeLevelId, kind: activeTool as DraftingEntity['kind'], points: [draftingStart, worldPos], radius };
+            setProject((prev) => ({ ...prev, draftingEntities: [...(prev.draftingEntities || []), entity] }));
+          }
+          setDraftingStart(null);
+        }
+      } else if (activeTool === 'wall') {
         if (!drawingStart) {
           setDrawingStart(worldPos);
         } else {
@@ -673,9 +697,10 @@ export const CADCanvas2D: React.FC<CADCanvas2DProps> = ({
           handleDeleteInternal();
         }
       } else if (e.key === 'Escape') {
-        if (selectedEntity) {
-          setSelectedEntity(null);
-        }
+        setDraftingStart(null);
+        setPolylinePoints([]);
+        setRoomDrawingPoints([]);
+        if (selectedEntity) setSelectedEntity(null);
       }
     };
 
@@ -731,6 +756,7 @@ export const CADCanvas2D: React.FC<CADCanvas2DProps> = ({
             />
           </pattern>
 
+          <pattern id="cad-hatch-pattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#a78bfa" strokeWidth="1" opacity="0.65" /></pattern>
           {/* Major Grid (5m) */}
           <pattern
             id="cad-major-grid-pattern"
@@ -841,6 +867,26 @@ export const CADCanvas2D: React.FC<CADCanvas2DProps> = ({
               })}
           </g>
         )}
+
+        {/* Native 2D drafting layer: linework, curves, construction lines and fills */}
+        <g id="cad-drafting-layer" pointerEvents="none">
+          {(project.draftingEntities || []).filter((entity) => entity.levelId === project.activeLevelId).map((entity) => {
+            const [a, b] = entity.points;
+            const p1 = a && worldToScreen(a.x, a.y); const p2 = b && worldToScreen(b.x, b.y);
+            const stroke = entity.kind === 'hatch' ? '#a78bfa' : entity.kind === 'point' ? '#f59e0b' : '#38bdf8';
+            if (!p1) return null;
+            if (entity.kind === 'point') return <g key={entity.id}><line x1={p1.x - 5} y1={p1.y} x2={p1.x + 5} y2={p1.y} stroke={stroke}/><line x1={p1.x} y1={p1.y - 5} x2={p1.x} y2={p1.y + 5} stroke={stroke}/></g>;
+            if (!p2) return null;
+            if (entity.kind === 'circle') return <circle key={entity.id} cx={p1.x} cy={p1.y} r={(entity.radius || 0) * validZoom} fill="none" stroke={stroke} strokeWidth="1.5" />;
+            if (entity.kind === 'ellipse') return <ellipse key={entity.id} cx={p1.x} cy={p1.y} rx={Math.abs(p2.x-p1.x)} ry={Math.max(2, Math.abs(p2.y-p1.y) / 2)} fill="none" stroke={stroke} strokeWidth="1.5" />;
+            if (entity.kind === 'rectangle' || entity.kind === 'hatch') return <rect key={entity.id} x={Math.min(p1.x,p2.x)} y={Math.min(p1.y,p2.y)} width={Math.abs(p2.x-p1.x)} height={Math.abs(p2.y-p1.y)} fill={entity.kind === 'hatch' ? 'url(#cad-hatch-pattern)' : 'none'} stroke={stroke} strokeWidth="1.5" />;
+            if (entity.kind === 'polygon') { const r = Math.hypot(p2.x-p1.x,p2.y-p1.y); return <polygon key={entity.id} points={Array.from({length: 6}, (_, i) => `${p1.x + Math.cos(i*Math.PI/3)*r},${p1.y + Math.sin(i*Math.PI/3)*r}`).join(' ')} fill="none" stroke={stroke} strokeWidth="1.5" />; }
+            if (entity.kind === 'arc') return <path key={entity.id} d={`M ${p1.x} ${p1.y} A ${(entity.radius || 1)*validZoom} ${(entity.radius || 1)*validZoom} 0 0 1 ${p2.x} ${p2.y}`} fill="none" stroke={stroke} strokeWidth="1.5" />;
+            if (entity.kind === 'ray' || entity.kind === 'xline') { const dx=p2.x-p1.x, dy=p2.y-p1.y, d=Math.hypot(dx,dy)||1; const k=2000/d; return <line key={entity.id} x1={entity.kind === 'xline' ? p1.x-dx*k : p1.x} y1={entity.kind === 'xline' ? p1.y-dy*k : p1.y} x2={p1.x+dx*k} y2={p1.y+dy*k} stroke={stroke} strokeDasharray="8,4" />; }
+            const points = entity.kind === 'polyline' || entity.kind === 'spline' ? entity.points.map((p) => { const q=worldToScreen(p.x,p.y); return `${q.x},${q.y}`; }).join(' ') : `${p1.x},${p1.y} ${p2.x},${p2.y}`;
+            return <polyline key={entity.id} points={points} fill="none" stroke={stroke} strokeWidth="1.5" strokeLinejoin="round" />;
+          })}
+        </g>
 
         {/* Rooms Polygons Layer */}
         <g id="cad-rooms-layer">

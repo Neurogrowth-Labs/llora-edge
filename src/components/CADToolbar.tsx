@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   MousePointer2,
   Hand,
@@ -22,6 +22,8 @@ import {
   Copy,
   ClipboardPaste,
   CopyPlus,
+  Shapes,
+  ChevronDown,
 } from 'lucide-react';
 import { DrawingTool, Level } from '../types/architecture';
 
@@ -72,6 +74,7 @@ export const CADToolbar: React.FC<CADToolbarProps> = ({
   onDuplicateSelected,
   canPaste = false,
 }) => {
+  const [isDraftingMenuOpen, setIsDraftingMenuOpen] = useState(false);
   const tools: { id: DrawingTool; label: string; icon: any; shortcut: string }[] = [
     { id: 'select', label: 'Select (V)', icon: MousePointer2, shortcut: 'V' },
     { id: 'pan', label: 'Pan Hand (H)', icon: Hand, shortcut: 'H' },
@@ -90,6 +93,33 @@ export const CADToolbar: React.FC<CADToolbarProps> = ({
     <div className="bg-[#0A0A0A] border-b border-[#222222] px-4 py-2 flex items-center justify-between gap-3 select-none z-20">
       {/* Left: Tool Selection */}
       <div className="flex items-center gap-1 overflow-x-auto py-0.5">
+        <div className="relative">
+          <button
+            id="cad-tool-drafting"
+            onClick={() => setIsDraftingMenuOpen((open) => !open)}
+            title="2D Drawing & modification commands"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-semibold text-cyan-300 hover:text-white hover:bg-[#222222] border border-[#264653]"
+          >
+            <Shapes className="w-3.5 h-3.5" />
+            <span>Draw</span><ChevronDown className="w-3 h-3" />
+          </button>
+          {isDraftingMenuOpen && (
+            <div className="absolute left-0 top-full mt-2 z-40 w-[430px] rounded-lg border border-[#333] bg-[#101010] p-3 shadow-2xl">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">2D drafting commands</div>
+              <div className="grid grid-cols-3 gap-1">
+                {[
+                  ['line', 'LINE'], ['polyline', 'PLINE'], ['circle', 'CIRCLE'], ['arc', 'ARC'], ['rectangle', 'RECTANG'], ['polygon', 'POLYGON'],
+                  ['ellipse', 'ELLIPSE'], ['spline', 'SPLINE'], ['point', 'POINT'], ['hatch', 'HATCH'], ['ray', 'RAY'], ['xline', 'XLINE'],
+                ].map(([id, command]) => (
+                  <button key={id} onClick={() => { setActiveTool(id as DrawingTool); setIsDraftingMenuOpen(false); }} className={`rounded px-2 py-2 text-left hover:bg-[#222] ${activeTool === id ? 'bg-[#2DD4BF]/15 text-[#2DD4BF]' : 'text-gray-300'}`}>
+                    <span className="block text-xs font-semibold capitalize">{id}</span><span className="text-[9px] font-mono text-gray-500">{command}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3 border-t border-[#292929] pt-2 text-[10px] text-gray-500">Modify: <b className="text-gray-300">MOVE</b> drag selected objects · <b className="text-gray-300">COPY</b> Ctrl+C · <b className="text-gray-300">ERASE</b> Delete · <b className="text-gray-300">OFFSET / TRIM / FILLET</b> available from the command console.</div>
+            </div>
+          )}
+        </div>
         <div className="flex items-center bg-[#141414] p-1 rounded-md border border-[#222222]">
           {tools.map((t) => {
             const Icon = t.icon;
