@@ -29,7 +29,12 @@ import {
   Zap,
   Upload,
   X,
-
+  Box,
+  Circle,
+  Triangle,
+  Cuboid,
+  Palette,
+  Trash2,
 } from 'lucide-react';
 import { bimTextures } from '../services/bimTextures';
 import {
@@ -67,6 +72,9 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
   const [ifcImportError, setIfcImportError] = useState<string | null>(null);
   const [hasImportedIfc, setHasImportedIfc] = useState(false);
+  const [modelingTool, setModelingTool] = useState<'box' | 'cylinder' | 'cone' | 'sphere' | 'torus' | 'wedge' | 'pyramid'>('box');
+  const [userSolids, setUserSolids] = useState<Array<{ id: string; kind: 'box' | 'cylinder' | 'cone' | 'sphere' | 'torus' | 'wedge' | 'pyramid'; color: string }>>([]);
+  const [visualStyle, setVisualStyle] = useState<'realistic' | 'conceptual' | 'wireframe' | 'xray'>('realistic');
 
 
   // Three.js Scene References
@@ -85,6 +93,7 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
   const windStreamlinesRef = useRef<THREE.Group | null>(null);
   const waterMeshRef = useRef<THREE.Mesh | null>(null);
   const importedIfcRef = useRef<THREE.Group | null>(null);
+  const userSolidsGroupRef = useRef<THREE.Group | null>(null);
 
   const ifcFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -177,6 +186,11 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
     const weatherGroup = new THREE.Group();
     scene.add(weatherGroup);
     weatherGroupRef.current = weatherGroup;
+
+    const userSolidsGroup = new THREE.Group();
+    userSolidsGroup.name = 'User Modeling Solids';
+    scene.add(userSolidsGroup);
+    userSolidsGroupRef.current = userSolidsGroup;
 
     // Build Site & Building Geometry
     buildSiteTerrain(siteGroup);
@@ -1205,6 +1219,51 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
     setIfcImportError(null);
   };
 
+  const addSolid = (kind: typeof modelingTool) => {
+    const palette = ['#2DD4BF', '#38BDF8', '#A78BFA', '#F59E0B', '#FB7185'];
+    setUserSolids((solids) => [...solids, { id: `solid_${Date.now()}_${solids.length}`, kind, color: palette[solids.length % palette.length] }]);
+  };
+
+  useEffect(() => {
+    const group = userSolidsGroupRef.current;
+    if (!group) return;
+    group.clear();
+    userSolids.forEach((solid, index) => {
+      const material = new THREE.MeshStandardMaterial({ color: solid.color, roughness: 0.38, metalness: 0.12 });
+      let geometry: THREE.BufferGeometry;
+      switch (solid.kind) {
+        case 'cylinder': geometry = new THREE.CylinderGeometry(1, 1, 2.2, 32); break;
+        case 'cone': geometry = new THREE.ConeGeometry(1.1, 2.4, 32); break;
+        case 'sphere': geometry = new THREE.SphereGeometry(1.15, 32, 20); break;
+        case 'torus': geometry = new THREE.TorusGeometry(1, 0.3, 16, 36); break;
+        case 'wedge': geometry = new THREE.CylinderGeometry(1.2, 1.2, 2.2, 3); break;
+        case 'pyramid': geometry = new THREE.ConeGeometry(1.35, 2.5, 4); break;
+        default: geometry = new THREE.BoxGeometry(2.2, 2.2, 2.2);
+      }
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.castShadow = true; mesh.receiveShadow = true;
+      mesh.position.set(3 + (index % 4) * 3.2, 1.2, 3 + Math.floor(index / 4) * 3.2);
+      group.add(mesh);
+    });
+  }, [userSolids]);
+
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+    scene.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      materials.forEach((material) => {
+        if (!('wireframe' in material)) return;
+        material.wireframe = visualStyle === 'wireframe';
+        if ('flatShading' in material) material.flatShading = visualStyle === 'conceptual';
+        material.transparent = visualStyle === 'xray';
+        material.opacity = visualStyle === 'xray' ? 0.28 : 1;
+        material.needsUpdate = true;
+      });
+    });
+  }, [visualStyle, project, userSolids]);
+
   const activeWeatherConfig = WEATHER_PRESETS[activeWeather];
   const activeScenarioConfig = SCENARIO_DEFINITIONS[activeScenario];
 
@@ -1454,6 +1513,24 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
             </label>
           </div>
         </div>
+      </div>
+
+      {/* 3D MODELING & VISUAL STYLE PALETTE */}
+      <div className="absolute bottom-20 left-4 z-20 w-64 rounded-lg border border-[#222222] bg-[#0A0A0A]/95 p-2.5 shadow-xl backdrop-blur-md">
+        <div className="mb-2 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-gray-300">
+          <span className="flex items-center gap-1.5"><Cuboid className="h-3.5 w-3.5 text-[#2DD4BF]" />3D Modeling</span>
+          {userSolids.length > 0 && <button onClick={() => setUserSolids([])} className="text-rose-300 hover:text-rose-200" title="Erase all created solids"><Trash2 className="h-3.5 w-3.5" /></button>}
+        </div>
+        <div className="grid grid-cols-4 gap-1">
+          {([
+            ['box', 'BOX', Box], ['cylinder', 'CYL', Circle], ['cone', 'CONE', Triangle], ['sphere', 'SPHERE', Circle], ['torus', 'TORUS', Circle], ['wedge', 'WEDGE', Triangle], ['pyramid', 'PYRAMID', Triangle],
+          ] as const).map(([kind, label, Icon]) => <button key={kind} onClick={() => { setModelingTool(kind); addSolid(kind); }} title={`${label}: create ${kind} solid`} className={`flex flex-col items-center rounded border px-1 py-1.5 text-[9px] font-bold transition ${modelingTool === kind ? 'border-[#2DD4BF]/60 bg-[#2DD4BF]/15 text-[#2DD4BF]' : 'border-[#222] bg-[#141414] text-gray-400 hover:text-white'}`}><Icon className="h-3.5 w-3.5 mb-0.5" />{label}</button>)}
+        </div>
+        <div className="mt-2 border-t border-[#222] pt-2">
+          <div className="mb-1 flex items-center gap-1 text-[9px] font-mono uppercase text-gray-500"><Palette className="h-3 w-3" /> Visual style</div>
+          <div className="grid grid-cols-4 gap-1">{(['realistic', 'conceptual', 'wireframe', 'xray'] as const).map((style) => <button key={style} onClick={() => setVisualStyle(style)} className={`rounded py-1 text-[9px] capitalize ${visualStyle === style ? 'bg-[#2DD4BF] text-black font-bold' : 'bg-[#141414] text-gray-400 hover:text-white'}`}>{style}</button>)}</div>
+        </div>
+        <p className="mt-1.5 text-[9px] leading-snug text-gray-500">Primitives are placed as editable visualization solids. Use orbit, section cut, solar, materials, and capture controls to inspect the scene.</p>
       </div>
 
       {/* RIGHT FLOATING DOCK (Solar Position, Time Slider, Section Cut, Exploded Spacing) */}

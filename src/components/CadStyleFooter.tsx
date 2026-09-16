@@ -220,10 +220,16 @@ export const CadStyleFooter: React.FC<CadStyleFooterProps> = ({
 
     if (cleanCmd === 'HELP' || cleanCmd === '?') {
       newHistory.push({
-        text: 'AVAILABLE CAD COMMANDS: WALL(W), DOOR(D), WINDOW(G), COLUMN(C), ROOM(R), DIM(M), SELECT(V), 3D, 2D, SNAP, ORTHO, OSNAP, LAYER, AUDIT, ASSIST, CLEAR',
+        text: 'DRAW: LINE, PLINE, CIRCLE, ARC, RECTANG, POLYGON, ELLIPSE, SPLINE, POINT, HATCH, RAY, XLINE. BIM: WALL, DOOR, WINDOW, COLUMN, ROOM. PRECISION: SNAP, ORTHO, OSNAP. VIEW: 2D, 3D. Type CLEAR to reset.',
         type: 'system',
         time,
       });
+    } else if (['LINE', 'L', 'PLINE', 'POLYLINE', 'CIRCLE', 'ARC', 'RECTANG', 'RECTANGLE', 'POLYGON', 'ELLIPSE', 'SPLINE', 'POINT', 'HATCH', 'RAY', 'XLINE'].includes(cleanCmd)) {
+      const commandTools: Record<string, DrawingTool> = { LINE: 'line', L: 'line', PLINE: 'polyline', POLYLINE: 'polyline', CIRCLE: 'circle', ARC: 'arc', RECTANG: 'rectangle', RECTANGLE: 'rectangle', POLYGON: 'polygon', ELLIPSE: 'ellipse', SPLINE: 'spline', POINT: 'point', HATCH: 'hatch', RAY: 'ray', XLINE: 'xline' };
+      const tool = commandTools[cleanCmd];
+      setActiveTool(tool);
+      setActiveStudioTab('2d');
+      newHistory.push({ text: `Tool activated: ${cleanCmd} — specify points in the plan view (Esc cancels).`, type: 'output', time });
     } else if (cleanCmd === 'WALL' || cleanCmd === 'W') {
       setActiveTool('wall');
       setActiveStudioTab('2d');
