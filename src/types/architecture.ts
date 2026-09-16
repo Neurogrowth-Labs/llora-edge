@@ -69,11 +69,33 @@ export type DrawingTool =
   | 'furniture'
   | 'dimension'
   | 'text'
-  | 'measure';
+  | 'measure'
+  | 'line'
+  | 'polyline'
+  | 'circle'
+  | 'arc'
+  | 'rectangle'
+  | 'polygon'
+  | 'ellipse'
+  | 'spline'
+  | 'point'
+  | 'hatch'
+  | 'ray'
+  | 'xline';
 
 export interface Point2D {
   x: number;
   y: number;
+}
+
+/** Lightweight 2D CAD entities retained alongside the architectural BIM model. */
+export interface DraftingEntity {
+  id: string;
+  levelId: string;
+  kind: 'line' | 'polyline' | 'circle' | 'arc' | 'rectangle' | 'polygon' | 'ellipse' | 'spline' | 'point' | 'hatch' | 'ray' | 'xline';
+  points: Point2D[];
+  radius?: number;
+  rotation?: number;
 }
 
 export interface Wall {
@@ -643,6 +665,8 @@ export interface ClientProposalRequest {
 }
 
 export interface ArchitecturalProject {
+  /** Native 2D geometry used for CAD drafting tools. */
+  draftingEntities?: DraftingEntity[];
   id: string;
   name: string;
   description: string;
