@@ -1,6 +1,12 @@
+import 'dotenv/config';
 import { readdir, readFile } from 'fs/promises';
 import path from 'path';
-import { db } from '../server/db';
+import { Pool } from 'pg';
+
+// Use DIRECT_URL for migrations (session mode, required for DDL)
+const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
+if (!connectionString) throw new Error('DIRECT_URL or DATABASE_URL is required');
+const db = new Pool({ connectionString });
 
 async function migrate(): Promise<void> {
   await db.query('CREATE TABLE IF NOT EXISTS schema_migrations (name text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())');

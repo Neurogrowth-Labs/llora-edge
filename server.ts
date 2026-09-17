@@ -2,7 +2,9 @@ import express from "express";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 import { convertIfcToGlb, IfcConversionError } from "./server/ifcConversion";
-
+import { passwordHash, passwordMatches, hash, createSession, requireAuth, AuthenticatedRequest } from "./server/auth";
+import { db } from "./server/db";
+import { assertProductionConfiguration } from "./server/config";
 
 assertProductionConfiguration();
 
@@ -10,13 +12,16 @@ const app = express();
 const PORT = 3000;
 
 app.disable("x-powered-by");
+const isProduction = process.env.NODE_ENV === "production";
 app.use((_req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "SAMEORIGIN");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  res.setHeader("Content-Security-Policy", "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: https://images.unsplash.com; connect-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'");
-  if (process.env.NODE_ENV === "production") res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  if (isProduction) {
+    res.setHeader("Content-Security-Policy", "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: https://images.unsplash.com; connect-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'");
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
   next();
 });
 app.use(express.json({ limit: "15mb" }));

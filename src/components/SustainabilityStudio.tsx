@@ -39,7 +39,7 @@ export const SustainabilityStudio: React.FC<SustainabilityStudioProps> = ({
   );
 
   const handleApplyToProject = () => {
-    setProject((prev) => ({
+    setProject((prev: ArchitecturalProject) => ({
       ...prev,
       sustainability: currentMetrics,
     }));
@@ -228,7 +228,7 @@ export const SustainabilityStudio: React.FC<SustainabilityStudioProps> = ({
                 max="25"
                 step="0.5"
                 value={solarPvKwp}
-                onChange={(e) => setSolarPvKwp(parseFloat(e.target.value))}
+                onChange={(e: { target: { value: string; }; }) => setSolarPvKwp(parseFloat(e.target.value))}
                 className="w-full h-2 bg-[#222222] rounded-lg appearance-none cursor-pointer accent-[#2DD4BF]"
               />
               <div className="flex justify-between text-[11px] text-gray-400 pt-1">
@@ -250,7 +250,7 @@ export const SustainabilityStudio: React.FC<SustainabilityStudioProps> = ({
                 max="30000"
                 step="1000"
                 value={rainwaterLiters}
-                onChange={(e) => setRainwaterLiters(parseInt(e.target.value))}
+                onChange={(e: { target: { value: string; }; }) => setRainwaterLiters(parseInt(e.target.value))}
                 className="w-full h-2 bg-[#222222] rounded-lg appearance-none cursor-pointer accent-cyan-400"
               />
               <div className="flex justify-between text-[11px] text-gray-400 pt-1">
@@ -267,7 +267,7 @@ export const SustainabilityStudio: React.FC<SustainabilityStudioProps> = ({
                 <input
                   type="checkbox"
                   checked={hasDoubleLowE}
-                  onChange={(e) => setHasDoubleLowE(e.target.checked)}
+                  onChange={(e: { target: { checked: any; }; }) => setHasDoubleLowE(e.target.checked)}
                   className="w-4 h-4 rounded accent-[#2DD4BF] cursor-pointer"
                 />
               </label>
@@ -277,7 +277,7 @@ export const SustainabilityStudio: React.FC<SustainabilityStudioProps> = ({
                 <input
                   type="checkbox"
                   checked={hasOverhangs}
-                  onChange={(e) => setHasOverhangs(e.target.checked)}
+                  onChange={(e: { target: { checked: any; }; }) => setHasOverhangs(e.target.checked)}
                   className="w-4 h-4 rounded accent-[#2DD4BF] cursor-pointer"
                 />
               </label>
@@ -287,7 +287,7 @@ export const SustainabilityStudio: React.FC<SustainabilityStudioProps> = ({
                 <input
                   type="checkbox"
                   checked={hasMassTimber}
-                  onChange={(e) => setHasMassTimber(e.target.checked)}
+                  onChange={(e: { target: { checked: any; }; }) => setHasMassTimber(e.target.checked)}
                   className="w-4 h-4 rounded accent-[#2DD4BF] cursor-pointer"
                 />
               </label>
@@ -325,7 +325,7 @@ export const SustainabilityStudio: React.FC<SustainabilityStudioProps> = ({
                 Passive Bioclimatic Architectural Directives:
               </h4>
               <ul className="space-y-2 text-xs text-gray-300">
-                {project.climate.passiveDesignRecommendations.map((rec, i) => (
+                {project.climate.passiveDesignRecommendations.map((rec: any, i: any) => (
                   <li key={i} className="flex items-start gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-[#2DD4BF] mt-0.5 shrink-0" />
                     <span>{rec}</span>
