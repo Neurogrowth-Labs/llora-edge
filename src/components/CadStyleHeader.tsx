@@ -130,6 +130,7 @@ interface CadStyleHeaderProps {
   onOpenSignIn?: () => void;
   onOpenSignUp?: () => void;
   onOpenOnboarding?: () => void;
+  onOpenProfileSettings?: () => void;
   onSignOut?: () => void;
   // CAD Tools & Navigation
   activeTool: DrawingTool;
@@ -181,6 +182,7 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
   onOpenSignIn,
   onOpenSignUp,
   onOpenOnboarding,
+  onOpenProfileSettings,
   onSignOut,
   activeTool,
   setActiveTool,
@@ -943,6 +945,22 @@ export const CadStyleHeader: React.FC<CadStyleHeaderProps> = ({
                   )}
 
                   <div className="my-1 border-t border-[#1F1F1F]" />
+
+                  {onOpenProfileSettings && (
+                    <button
+                      onClick={() => {
+                        setIsUserMenuOpen(false);
+                        onOpenProfileSettings();
+                      }}
+                      className="w-full px-3 py-1.5 text-left flex items-center gap-2 hover:bg-[#1A1A1A] text-white font-medium"
+                    >
+                      <Settings className="w-3.5 h-3.5 text-[#2DD4BF]" />
+                      <div className="flex-1">
+                        <div>Profile & Settings</div>
+                        <div className="text-[10px] text-gray-400">Account, sessions, preferences</div>
+                      </div>
+                    </button>
+                  )}
 
                   <button
                     onClick={() => {

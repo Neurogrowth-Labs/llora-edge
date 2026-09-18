@@ -334,21 +334,22 @@ export const Viewer3D: React.FC<Viewer3DProps> = ({ project, onOpenAiRender }) =
     buildProject3DGeometry();
   }, [project, activeScenario, isolatedLevel, sectionCutHeight, explodedSpacing, showTrees, showFurniture, activeWeather]);
 
-  useEffect(() => {
-    if (godsEyeContextRef.current) godsEyeContextRef.current.visible = isGodsEyeContextVisible;
-  }, [isGodsEyeContextVisible]);
+  // TODO: God's Eye Context feature - to be implemented
+  // useEffect(() => {
+  //   if (godsEyeContextRef.current) godsEyeContextRef.current.visible = isGodsEyeContextVisible;
+  // }, [isGodsEyeContextVisible]);
 
-  useEffect(() => {
-    if (!sceneRef.current) return;
-    if (godsEyeContextRef.current) {
-      sceneRef.current.remove(godsEyeContextRef.current);
-      disposeGodsEyeContext(godsEyeContextRef.current);
-    }
-    const context = createGodsEyeContext(project);
-    context.visible = isGodsEyeContextVisible;
-    sceneRef.current.add(context);
-    godsEyeContextRef.current = context;
-  }, [project]);
+  // useEffect(() => {
+  //   if (!sceneRef.current) return;
+  //   if (godsEyeContextRef.current) {
+  //     sceneRef.current.remove(godsEyeContextRef.current);
+  //     disposeGodsEyeContext(godsEyeContextRef.current);
+  //   }
+  //   const context = createGodsEyeContext(project);
+  //   context.visible = isGodsEyeContextVisible;
+  //   sceneRef.current.add(context);
+  //   godsEyeContextRef.current = context;
+  // }, [project]);
 
   // --------------------------------------------------------------------------
   // ATMOSPHERE, SKY, SUN & LIGHTING LOGIC

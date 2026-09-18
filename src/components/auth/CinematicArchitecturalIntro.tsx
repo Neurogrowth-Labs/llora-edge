@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { OPENING_LOGO, OPENING_LOGO_STATIC_URL, BRAND_NAME } from '../../assets/logo';
 import { ArchitectProfile } from '../../types/auth';
+import { useToast } from '../ui/Toast';
 
 export type SequencePhase = 'draw' | 'structure' | 'form' | 'intelligence' | 'signin';
 
@@ -35,6 +36,8 @@ export const CinematicArchitecturalIntro: React.FC<CinematicArchitecturalIntroPr
   onEnterAsGuest,
   autoPlay = true,
 }) => {
+  const { showFeatureToast } = useToast();
+
   // Sequence Timeline State
   const [phase, setPhase] = useState<SequencePhase>(autoPlay ? 'draw' : 'signin');
   const [elapsedMs, setElapsedMs] = useState<number>(0);
@@ -839,7 +842,7 @@ export const CinematicArchitecturalIntro: React.FC<CinematicArchitecturalIntroPr
                     </label>
                     <button
                       type="button"
-                      onClick={() => alert('Password reset link has been dispatched to your verified architectural practice email.')}
+                      onClick={() => showFeatureToast('Password Reset')}
                       className="text-[11px] font-mono text-[#D4AF37] hover:underline"
                     >
                       Forgot password?

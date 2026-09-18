@@ -3,6 +3,7 @@ import { Bot, Radio, Battery, Activity, Play, Pause, RotateCcw, Crosshair, Wifi,
 import { roboticsService, RobotTelemetry } from '../services/roboticsService';
 import { DataStateBadge } from './DataStateBadge';
 import { DataState } from '../types/architecture';
+import { useToast } from './ui/Toast';
 
 interface RoboticsControlModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface RoboticsControlModalProps {
 }
 
 export const RoboticsControlModal: React.FC<RoboticsControlModalProps> = ({ isOpen, onClose }) => {
+  const { showFeatureToast } = useToast();
   const [robots, setRobots] = useState<RobotTelemetry[]>([]);
   const [selectedRobotId, setSelectedRobotId] = useState<string>('bot_lidar_01');
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
@@ -27,6 +29,7 @@ export const RoboticsControlModal: React.FC<RoboticsControlModalProps> = ({ isOp
 
   const handleCommand = async (type: 'start_survey' | 'return_home' | 'pause_print' | 'resume_print' | 'calibrate_origin') => {
     if (!selectedRobot) return;
+    showFeatureToast('Robotics Control');
     const res = await roboticsService.sendCommand(selectedRobot.id, type);
     setActionFeedback(res.message);
     setTimeout(() => setActionFeedback(null), 3500);
@@ -34,6 +37,7 @@ export const RoboticsControlModal: React.FC<RoboticsControlModalProps> = ({ isOp
 
   const handleSetDataState = (state: DataState) => {
     if (!selectedRobot) return;
+    showFeatureToast('Data State Override');
     roboticsService.setDataState(selectedRobot.id, state);
     setActionFeedback(`Data State manually set to ${state}`);
     setTimeout(() => setActionFeedback(null), 3000);

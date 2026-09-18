@@ -28,6 +28,7 @@ import { ArchitecturalProject } from '../types/architecture';
 import { SpatialAgentRole } from '../types/digitalTwin';
 import { SPATIAL_AI_AGENTS } from '../data/digitalTwinData';
 import { interpretSpatialCopilotQuery } from '../services/spatialCopilotEngine';
+import { useToast } from './ui/Toast';
 
 interface SpatialCopilotProps {
   project: ArchitecturalProject;
@@ -59,6 +60,7 @@ export const SpatialCopilot: React.FC<SpatialCopilotProps> = ({
   isEmbedded = false,
   onClose,
 }) => {
+  const { showFeatureToast } = useToast();
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
   const [selectedAgentRole, setSelectedAgentRole] = useState<SpatialAgentRole | 'ALL'>('ALL');
   const [queryInput, setQueryInput] = useState<string>('');
@@ -103,6 +105,7 @@ export const SpatialCopilot: React.FC<SpatialCopilotProps> = ({
     if (!textToSend) setQueryInput('');
 
     setTimeout(() => {
+      showFeatureToast('Spatial AI Query');
       const result = interpretSpatialCopilotQuery(query, project);
 
       if (result.updatedProject) {

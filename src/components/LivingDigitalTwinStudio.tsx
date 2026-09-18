@@ -73,6 +73,7 @@ import {
   INITIAL_RISK_RADAR_ZONES,
 } from '../data/digitalTwinData';
 import { DataStateBadge } from './DataStateBadge';
+import { useToast } from './ui/Toast';
 
 interface LivingDigitalTwinStudioProps {
   project: ArchitecturalProject;
@@ -97,6 +98,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
   setProject,
   onClose,
 }) => {
+  const { showFeatureToast } = useToast();
   const [activeTab, setActiveTab] = useState<TwinSubTab>('overview');
 
   // Reality capture state
@@ -148,6 +150,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
 
   // Trigger Live Reality Capture Scan
   const handleTriggerLiveScan = () => {
+    showFeatureToast('Reality Capture');
     setIsCapturingLive(true);
     setTimeout(() => {
       const newDataset: RealityCaptureDataset = {
@@ -170,6 +173,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
 
   // Trigger Design Material Scanner
   const handleTriggerMaterialScanner = () => {
+    showFeatureToast('Material Scanner');
     setIsScanningMaterial(true);
     setTimeout(() => {
       setScannerMaterialDetected('Structural Steel & Low-E Glazing (Confidence: 94%)');
@@ -179,6 +183,7 @@ export const LivingDigitalTwinStudio: React.FC<LivingDigitalTwinStudioProps> = (
 
   // Trigger Generative Options Synthesizer
   const handleSynthesizeGenerativeOptions = () => {
+    showFeatureToast('Generative Design');
     setIsGeneratingOptions(true);
     setTimeout(() => {
       setIsGeneratingOptions(false);

@@ -26,6 +26,7 @@ import { DeveloperIntelligenceStudio } from './components/DeveloperIntelligenceS
 import { ClientModeView } from './components/ClientModeView';
 import { DataStateInspectorModal } from './components/DataStateInspectorModal';
 import { LivingDigitalTwinStudio } from './components/LivingDigitalTwinStudio';
+import { ProfileSettingsModal } from './components/ProfileSettingsModal';
 import { evaluateBuildingIntelligenceScore } from './services/buildingIntelligenceEngine';
 import { ArchitectProfile, DEFAULT_ARCHITECT_PROFILE, loadSavedProfile, saveProfile } from './types/auth';
 import { SignUpView } from './components/auth/SignUpView';
@@ -80,6 +81,7 @@ export function App() {
   const [isDesignDnaOpen, setIsDesignDnaOpen] = useState<boolean>(false);
   const [isClientModeActive, setIsClientModeActive] = useState<boolean>(false);
   const [isDataStateInspectorOpen, setIsDataStateInspectorOpen] = useState<boolean>(false);
+  const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState<boolean>(false);
 
   // Architectural Identity, Authentication & Studio Calibration State
   const [authView, setAuthView] = useState<'studio' | 'sign_up' | 'sign_in' | 'onboarding'>('sign_in');
@@ -122,6 +124,22 @@ export function App() {
       }));
     }
     setAuthView('studio');
+  };
+
+  const handleProfileUpdate = (profileData: Partial<ArchitectProfile>) => {
+    setArchitectProfile((prev) => {
+      const updated = { ...prev, ...profileData };
+      saveProfile(updated);
+      // Update project metadata if studio name changed
+      if (profileData.studioName || profileData.fullName) {
+        setProject((p) => ({
+          ...p,
+          companyName: updated.studioName,
+          architectName: updated.fullName,
+        }));
+      }
+      return updated;
+    });
   };
 
   // Granular UI Header & Footer Visibility (Top Header is ALWAYS visible)
@@ -561,6 +579,7 @@ export function App() {
         onOpenSignIn={() => setAuthView('sign_in')}
         onOpenSignUp={() => setAuthView('sign_up')}
         onOpenOnboarding={() => setAuthView('onboarding')}
+        onOpenProfileSettings={() => setIsProfileSettingsOpen(true)}
         onSignOut={handleSignOut}
         activeTool={activeTool}
         setActiveTool={setActiveTool}
@@ -752,6 +771,14 @@ export function App() {
         onClose={() => setIsDesignDnaOpen(false)}
         project={project}
         setProject={setProject}
+      />
+
+      <ProfileSettingsModal
+        isOpen={isProfileSettingsOpen}
+        onClose={() => setIsProfileSettingsOpen(false)}
+        architectProfile={architectProfile}
+        onProfileUpdate={handleProfileUpdate}
+        onSignOut={handleSignOut}
       />
 
       <AiCopilotDrawer

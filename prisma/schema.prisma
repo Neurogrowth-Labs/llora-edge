@@ -1,0 +1,292 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================================
+// USER & AUTHENTICATION
+// ============================================================================
+
+model User {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email           String
+  passwordHash    String    @map("password_hash")
+  fullName        String    @map("full_name")
+  studioName      String?   @map("studio_name")
+  role            UserRole  @default(architect)
+  avatarUrl       String?   @map("avatar_url")
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  // Relations
+  sessions           Session[]
+  projects           Project[]
+  projectShares      ProjectShare[]
+  comments           Comment[]
+  notifications      Notification[]
+  projectVersions    ProjectVersion[]
+  projectFiles       ProjectFile[]
+  folders            Folder[]
+  auditEvents        AuditEvent[]
+  passwordResetToken PasswordResetToken?
+  emailVerifyToken   EmailVerifyToken?
+
+  // Note: users_email_active_unique is a partial index created via SQL migration
+  // Prisma doesn't support partial indexes natively
+  @@map("users")
+}
+
+model Session {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  tokenHash  String   @unique @map("token_hash")
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastSeenAt DateTime @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+  ip         String?  @db.Inet
+  userAgent  String?  @map("user_agent")
+  deviceName String?  @map("device_name")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
+
+model EmailVerifyToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_verify_tokens")
+}
+
+// ============================================================================
+// PROJECT MANAGEMENT
+// ============================================================================
+
+model Folder {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId   String   @map("owner_id") @db.Uuid
+  name      String
+  parentId  String?  @map("parent_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  parent   Folder?   @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children Folder[]  @relation("FolderHierarchy")
+  projects Project[]
+
+  @@map("folders")
+}
+
+model Project {
+  id            String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId       String            @map("owner_id") @db.Uuid
+  folderId      String?           @map("folder_id") @db.Uuid
+  name          String
+  description   String?
+  model         Json
+  version       Int               @default(1)
+  isPublic      Boolean           @default(false) @map("is_public")
+  isArchived    Boolean           @default(false) @map("is_archived")
+  isFavorite    Boolean           @default(false) @map("is_favorite")
+  coverImageUrl String?           @map("cover_image_url")
+  tags          String[]          @default([])
+  visibility    ProjectVisibility @default(private)
+  createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt     DateTime?         @map("deleted_at") @db.Timestamptz(6)
+
+  // Relations
+  owner    User             @relation(fields: [ownerId], references: [id])
+  folder   Folder?          @relation(fields: [folderId], references: [id])
+  shares   ProjectShare[]
+  comments Comment[]
+  versions ProjectVersion[]
+  files    ProjectFile[]
+
+  @@index([ownerId, updatedAt(sort: Desc)])
+  @@map("projects")
+}
+
+model ProjectVersion {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId   String   @map("project_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  version     Int
+  description String?
+  modelData   Json     @map("model_data")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([projectId], map: "project_versions_project_idx")
+  @@map("project_versions")
+}
+
+// ============================================================================
+// SHARING & COLLABORATION
+// ============================================================================
+
+model ProjectShare {
+  id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId    String          @map("project_id") @db.Uuid
+  userId       String?         @map("user_id") @db.Uuid
+  permission   SharePermission @default(viewer)
+  shareToken   String?         @unique @map("share_token")
+  passwordHash String?         @map("password_hash")
+  expiresAt    DateTime?       @map("expires_at") @db.Timestamptz(6)
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([projectId], map: "project_shares_project_idx")
+  @@map("project_shares")
+}
+
+model Comment {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId  String   @map("project_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  parentId   String?  @map("parent_id") @db.Uuid
+  content    String
+  position   Json? // {x, y, z} for 3D or {x, y} for 2D
+  isResolved Boolean  @default(false) @map("is_resolved")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  project Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User      @relation(fields: [userId], references: [id])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([projectId], map: "comments_project_idx")
+  @@map("comments")
+}
+
+// ============================================================================
+// FILE MANAGEMENT
+// ============================================================================
+
+model ProjectFile {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  projectId   String   @map("project_id") @db.Uuid
+  uploadedBy  String   @map("uploaded_by") @db.Uuid
+  name        String
+  storagePath String   @map("storage_path")
+  sizeBytes   BigInt   @map("size_bytes")
+  mimeType    String?  @map("mime_type")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [uploadedBy], references: [id])
+
+  @@index([projectId], map: "project_files_project_idx")
+  @@map("project_files")
+}
+
+// ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+model Notification {
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
+  title     String
+  body      String?
+  link      String?
+  isRead    Boolean          @default(false) @map("is_read")
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+// ============================================================================
+// AUDIT & LOGGING
+// ============================================================================
+
+model AuditEvent {
+  id         BigInt   @id @default(autoincrement())
+  userId     String?  @map("user_id") @db.Uuid
+  action     String
+  targetType String   @map("target_type")
+  targetId   String?  @map("target_id")
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt(sort: Desc)], map: "audit_events_user_created_idx")
+  @@map("audit_events")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  owner
+  admin
+  architect
+  viewer
+}
+
+enum ProjectVisibility {
+  private
+  public
+  unlisted
+}
+
+enum SharePermission {
+  viewer
+  editor
+  admin
+}
+
+enum NotificationType {
+  project_shared
+  comment_added
+  comment_reply
+  mention
+  project_updated
+  system
+}
